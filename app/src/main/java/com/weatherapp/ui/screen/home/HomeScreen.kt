@@ -20,6 +20,7 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -71,6 +72,7 @@ fun HomeScreen() {
         Text(
             text = "27°C",
             fontSize = 90.sp,
+            fontFamily = FontFamily.Serif,
             color = Color.White,
             modifier = Modifier
                 .constrainAs(txtTemperature) {
@@ -203,6 +205,7 @@ fun HomeScreen() {
             modifier = Modifier
                 .constrainAs(lcWeather) {
                     top.linkTo(txtDate.bottom, MEDIUM_MARGIN)
+                    bottom.linkTo(parent.bottom, BIG_MARGIN)
                     end.linkTo(parent.end)
                     start.linkTo(parent.start)
                 }

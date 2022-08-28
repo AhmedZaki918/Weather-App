@@ -11,5 +11,5 @@ val HomeBackground = Color(0xFF121418)
 val Secondary = Color(0xFFcacac8)
 val Hint = Color(0xFFc6b560)
 val ListContent = Color(0xFF404244)
-
+val StatusBar = Color(0xFF191d22)
 

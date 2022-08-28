@@ -7,10 +7,10 @@ class HomeRepo {
 
     fun displayFakeData(): List<TodayWeather> {
         return listOf(
-            TodayWeather(R.drawable.preview_cloudy,"20°","00:00"),
-            TodayWeather(R.drawable.preview_cloudy,"23°","03:00"),
-            TodayWeather(R.drawable.preview_cloudy,"25°","06:00"),
-            TodayWeather(R.drawable.preview_cloudy,"28°","09:00"),
+            TodayWeather(R.drawable.preview_cloudy,"20°","Now"),
+            TodayWeather(R.drawable.preview_cloudy,"23°","3:00"),
+            TodayWeather(R.drawable.preview_cloudy,"25°","6:00"),
+            TodayWeather(R.drawable.preview_cloudy,"28°","9:00"),
             TodayWeather(R.drawable.preview_cloudy,"33°","12:00"),
             TodayWeather(R.drawable.preview_cloudy,"36°","15:00"),
             TodayWeather(R.drawable.preview_cloudy,"31°","18:00"),
