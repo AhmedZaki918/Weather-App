@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.material.Icon
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -28,7 +27,9 @@ fun ListTodayWeather(todayWeather: TodayWeather) {
     Card(
         shape = RoundedCornerShape(30.dp),
         elevation = 10.dp,
-        modifier = Modifier.padding(8.dp).size(60.dp,110.dp),
+        modifier = Modifier
+            .padding(8.dp)
+            .size(60.dp, 110.dp),
         backgroundColor = ListContent
     ) {
 
@@ -39,8 +40,7 @@ fun ListTodayWeather(todayWeather: TodayWeather) {
             Icon(
                 painter = painterResource(id = todayWeather.icon),
                 contentDescription = "",
-                tint = Color.White
-                ,
+                tint = Color.White,
                 modifier = Modifier
                     .constrainAs(icWeather) {
                         top.linkTo(parent.top)

@@ -39,11 +39,14 @@ fun HomeScreen() {
             .background(HomeBackground)
             .fillMaxSize()
             .verticalScroll(scrollState)
+            .padding(bottom = 70.dp)
     ) {
 
-        val (icLocation, txtLocation, txtTemperature, txtFeelsLike, txtWeather,
+        val (
+            icLocation, txtLocation, txtTemperature, txtFeelsLike, txtWeather,
             icWind, txtWind, ivWeather, txtVisibility, icVisibility,
-            boxHumidityPercentage, txtHumidity, txtDate, lcWeather) = createRefs()
+            boxHumidityPercentage, txtHumidity, txtDate, lrWeather
+        ) = createRefs()
 
         Text(
             text = "Cairo",
@@ -203,16 +206,15 @@ fun HomeScreen() {
 
         LazyRow(
             modifier = Modifier
-                .constrainAs(lcWeather) {
+                .constrainAs(lrWeather) {
                     top.linkTo(txtDate.bottom, MEDIUM_MARGIN)
-                    bottom.linkTo(parent.bottom, BIG_MARGIN)
                     end.linkTo(parent.end)
                     start.linkTo(parent.start)
                 }
                 .padding(start = MEDIUM_MARGIN, end = MEDIUM_MARGIN)
         ) {
             items(data) {
-                ListTodayWeather(it)
+                ListTodayWeather(todayWeather = it)
             }
         }
     }
