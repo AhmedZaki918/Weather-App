@@ -12,17 +12,23 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.weatherapp.MainActivity
+import com.weatherapp.data.viewmodel.HomeViewModel
 import com.weatherapp.ui.theme.StatusBar
 
 
 @Composable
-fun MainScreen() {
+fun MainScreen(viewModel: HomeViewModel, mainActivity: MainActivity) {
 
     val navController = rememberNavController()
     Scaffold(
         bottomBar = { BottomBar(navController = navController) }
     ) {
-        BottomNavGraph(navController = navController)
+        BottomNavGraph(
+            navController = navController,
+            viewModel = viewModel,
+            mainActivity = mainActivity
+        )
     }
 }
 
@@ -80,5 +86,4 @@ fun RowScope.AddItem(
 @Preview(showSystemUi = true)
 @Composable
 fun MainScreenPreview() {
-    MainScreen()
 }

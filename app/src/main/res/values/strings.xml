@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">WeatherApp</string>
+
+    <!--  Api response errors  -->
+    <string name="invalid_auth">The given data was invalid.</string>
+    <string name="not_found">Sorry, something went wrong</string>
+    <string name="connection_error">Please check your internet connection</string>
 </resources>
