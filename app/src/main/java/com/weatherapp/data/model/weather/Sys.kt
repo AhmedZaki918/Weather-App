@@ -1,4 +1,4 @@
-package com.weatherapp.data.model
+package com.weatherapp.data.model.weather
 
 data class Sys(
     val country: String? = "",

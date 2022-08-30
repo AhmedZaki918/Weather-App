@@ -1,4 +1,4 @@
-package com.weatherapp.data.model
+package com.weatherapp.data.model.forecast
 
 data class WeatherItem(
     val icon: String? = "",

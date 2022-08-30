@@ -1,4 +1,4 @@
-package com.weatherapp.data.model
+package com.weatherapp.data.model.forecast
 
 data class Coord(
     val lon: Double? = 0.0,

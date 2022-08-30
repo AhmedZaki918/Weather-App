@@ -20,7 +20,10 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             WeatherAppTheme {
-                MainScreen(viewModel = viewModel,this)
+                MainScreen(
+                    viewModel = viewModel,
+                    this
+                )
             }
         }
     }

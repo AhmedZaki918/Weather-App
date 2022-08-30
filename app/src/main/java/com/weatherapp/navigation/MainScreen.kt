@@ -18,7 +18,10 @@ import com.weatherapp.ui.theme.StatusBar
 
 
 @Composable
-fun MainScreen(viewModel: HomeViewModel, mainActivity: MainActivity) {
+fun MainScreen(
+    viewModel: HomeViewModel,
+    mainActivity: MainActivity
+) {
 
     val navController = rememberNavController()
     Scaffold(

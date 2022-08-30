@@ -8,7 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
@@ -31,10 +31,12 @@ import coil.annotation.ExperimentalCoilApi
 import coil.compose.rememberImagePainter
 import com.weatherapp.MainActivity
 import com.weatherapp.R
-import com.weatherapp.RequestState
-import com.weatherapp.data.model.CurrentWeatherResponse
+import com.weatherapp.data.local.Constants.FORMAT_TYPE
+import com.weatherapp.data.model.forecast.ListItem
+import com.weatherapp.data.model.weather.CurrentWeatherResponse
 import com.weatherapp.data.network.Resource
 import com.weatherapp.data.viewmodel.HomeViewModel
+import com.weatherapp.formatDate
 import com.weatherapp.handleApiError
 import com.weatherapp.ui.theme.*
 
@@ -44,32 +46,35 @@ fun HomeScreen(
     mainActivity: MainActivity
 ) {
 
-    if (viewModel.requestState.value == RequestState.LOADING) {
-        LoadingScreen()
-    } else {
-        UpdateUi(
-            viewModel,
-            mainActivity
-        )
-    }
-
     LaunchedEffect(key1 = true) {
         viewModel.initCurrentWeather()
+        viewModel.initFiveDaysForecast()
     }
+
+    UpdateUi(
+        viewModel,
+        mainActivity
+    )
+
+//    if (viewModel.requestState.value == RequestState.LOADING) {
+//        LoadingScreen()
+//    } else {
+//
+//    }
 }
 
 
-@Composable
-fun LoadingScreen() {
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(HomeBackground),
-        contentAlignment = Alignment.Center
-    ) {
-        CircularProgressIndicator()
-    }
-}
+//@Composable
+//fun LoadingScreen() {
+//    Box(
+//        modifier = Modifier
+//            .fillMaxSize()
+//            .background(HomeBackground),
+//        contentAlignment = Alignment.Center
+//    ) {
+//        CircularProgressIndicator()
+//    }
+//}
 
 @ExperimentalCoilApi
 @Composable
@@ -80,6 +85,17 @@ fun UpdateUi(
 
     val context = LocalContext.current
     val scrollState = rememberScrollState()
+    var data: CurrentWeatherResponse? = null
+    var forecast: List<ListItem> = listOf()
+    var idIcon: Int? = null
+
+    var weatherState by remember {
+        mutableStateOf(false)
+    }
+
+    var forecastState by remember {
+        mutableStateOf(false)
+    }
 
     ConstraintLayout(
         modifier = Modifier
@@ -96,11 +112,10 @@ fun UpdateUi(
         ) = createRefs()
 
 
-        var data: CurrentWeatherResponse? = null
-        var idIcon: Int? = null
 
         viewModel.currentWeather.observe(mainActivity) { response ->
             if (response is Resource.Success) {
+                weatherState = true
                 data = response.value
                 idIcon = data?.weather?.get(0)?.id
             } else {
@@ -109,8 +124,18 @@ fun UpdateUi(
         }
 
 
+        viewModel.weatherForecast.observe(mainActivity) { response ->
+            if (response is Resource.Success) {
+                forecastState = true
+                forecast = response.value.list!!
+            } else {
+                context.handleApiError(response as Resource.Failure)
+            }
+        }
+
+
         Text(
-            text = data?.name.toString(),
+            text = isTrue(weatherState, data?.name.toString()),
             color = Color.White,
             fontSize = 18.sp,
             modifier = Modifier
@@ -136,7 +161,11 @@ fun UpdateUi(
 
 
         Text(
-            text = "${data?.main?.temp.toString().substring(0, 2)}°C",
+            text = if (weatherState) {
+                "${data?.main?.temp.toString().substring(0, 2)}°C"
+            } else {
+                ""
+            },
             fontSize = 90.sp,
             fontFamily = FontFamily.Serif,
             color = Color.White,
@@ -149,7 +178,10 @@ fun UpdateUi(
         )
 
         Text(
-            text = "Feels like ${data?.main?.feels_like.toString().substring(0, 2)}°C",
+            text = isTrue(
+                weatherState,
+                "Feels like ${data?.main?.feels_like.toString().substring(0, 2)}°C"
+            ),
             fontSize = 16.sp,
             color = Secondary,
             modifier = Modifier
@@ -162,7 +194,7 @@ fun UpdateUi(
 
 
         Text(
-            text = data?.weather?.get(0)?.main.toString(),
+            text = isTrue(weatherState, data?.weather?.get(0)?.main.toString()),
             fontSize = 18.sp,
             color = Hint,
             modifier = Modifier
@@ -186,7 +218,7 @@ fun UpdateUi(
 
 
         Text(
-            text = "${data?.wind?.speed} m/s",
+            text = isTrue(weatherState, "${data?.wind?.speed} m/s"),
             fontSize = 16.sp,
             color = Secondary,
             modifier = Modifier
@@ -227,7 +259,7 @@ fun UpdateUi(
 
 
         Text(
-            text = "Visibility ${data?.visibility?.div(1000)} km",
+            text = isTrue(weatherState, "Visibility ${data?.visibility?.div(1000)} km"),
             fontSize = 16.sp,
             color = Secondary,
             modifier = Modifier
@@ -267,14 +299,13 @@ fun UpdateUi(
 
 
 
-
         Text(
             buildAnnotatedString {
                 withStyle(style = SpanStyle(color = Color.White)) {
                     append("Today\n")
                 }
                 withStyle(style = SpanStyle(color = Secondary, fontSize = 14.sp)) {
-                    append("27.08.2022")
+                    append(formatDate(FORMAT_TYPE))
                 }
             },
             modifier = Modifier
@@ -285,7 +316,6 @@ fun UpdateUi(
         )
 
 
-//        val data = HomeRepo().displayFakeData()
 
         LazyRow(
             modifier = Modifier
@@ -296,9 +326,11 @@ fun UpdateUi(
                 }
                 .padding(start = MEDIUM_MARGIN, end = MEDIUM_MARGIN)
         ) {
-//            items(data) {
-//                ListTodayWeather(todayWeather = it)
-//            }
+            items(forecast) {
+                if (forecastState) {
+                    ListTodayWeather(forecast = it)
+                }
+            }
         }
     }
 }
@@ -349,6 +381,11 @@ fun Circle(
             fontSize = 20.sp,
         )
     }
+}
+
+
+fun isTrue(state: Boolean, text: String): String {
+    return if (state) text else "loading.."
 }
 
 
