@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">WeatherApp</string>
+    <string name="invalid_auth">بيانات غير صحيحة</string>
+    <string name="not_found">عذرا حدث شيئ خطأ</string>
+    <string name="connection_error">تفقد اتصالك بالانترنت</string>
+    <string name="humidity">الرطوبة</string>
+    <string name="today">اليوم</string>
+    <string name="visibility">الرؤية</string>
+    <string name="km">كم</string>
+    <string name="feels_like">الاحساس الفعلى</string>
+    <string name="km_h">كم/س</string>
+</resources>

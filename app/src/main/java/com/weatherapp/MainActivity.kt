@@ -21,8 +21,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             WeatherAppTheme {
                 MainScreen(
-                    viewModel = viewModel,
-                    this
+                    viewModel = viewModel
                 )
             }
         }

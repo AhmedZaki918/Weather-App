@@ -4,6 +4,7 @@ import okhttp3.ResponseBody
 
 // To handle all api response
 sealed class Resource<out T> {
+    object Idle : Resource<Nothing>()
     data class Success<out T>(val value: T) : Resource<T>()
     data class Failure(
         val isNetworkError: Boolean,

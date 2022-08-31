@@ -13,7 +13,7 @@ class HomeRepo @Inject constructor(private val api: APIService) : SafeApiCall {
             API_KEY,
             30.3162878,
             31.73694101738903,
-            "metric"
+            "metric",
         )
     }
 
@@ -23,7 +23,7 @@ class HomeRepo @Inject constructor(private val api: APIService) : SafeApiCall {
             30.3162878,
             31.73694101738903,
             9,
-            "metric"
+            "metric",
         )
     }
 }

@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
@@ -19,6 +20,7 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontFamily
@@ -29,9 +31,10 @@ import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import coil.annotation.ExperimentalCoilApi
 import coil.compose.rememberImagePainter
-import com.weatherapp.MainActivity
 import com.weatherapp.R
+import com.weatherapp.RequestState
 import com.weatherapp.data.local.Constants.FORMAT_TYPE
+import com.weatherapp.data.model.forecast.FiveDaysForecastResponse
 import com.weatherapp.data.model.forecast.ListItem
 import com.weatherapp.data.model.weather.CurrentWeatherResponse
 import com.weatherapp.data.network.Resource
@@ -42,60 +45,42 @@ import com.weatherapp.ui.theme.*
 
 @Composable
 fun HomeScreen(
-    viewModel: HomeViewModel,
-    mainActivity: MainActivity
+    viewModel: HomeViewModel
 ) {
 
-    LaunchedEffect(key1 = true) {
-        viewModel.initCurrentWeather()
-        viewModel.initFiveDaysForecast()
+    if (viewModel.requestState.value == RequestState.LOADING) {
+        LoadingScreen()
+    } else {
+        UpdateUi(viewModel)
     }
-
-    UpdateUi(
-        viewModel,
-        mainActivity
-    )
-
-//    if (viewModel.requestState.value == RequestState.LOADING) {
-//        LoadingScreen()
-//    } else {
-//
-//    }
 }
 
 
-//@Composable
-//fun LoadingScreen() {
-//    Box(
-//        modifier = Modifier
-//            .fillMaxSize()
-//            .background(HomeBackground),
-//        contentAlignment = Alignment.Center
-//    ) {
-//        CircularProgressIndicator()
-//    }
-//}
+@Composable
+fun LoadingScreen() {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(HomeBackground),
+        contentAlignment = Alignment.Center
+    ) {
+        CircularProgressIndicator()
+    }
+}
+
 
 @ExperimentalCoilApi
 @Composable
 fun UpdateUi(
-    viewModel: HomeViewModel,
-    mainActivity: MainActivity
+    viewModel: HomeViewModel
 ) {
 
     val context = LocalContext.current
     val scrollState = rememberScrollState()
     var data: CurrentWeatherResponse? = null
     var forecast: List<ListItem> = listOf()
-    var idIcon: Int? = null
 
-    var weatherState by remember {
-        mutableStateOf(false)
-    }
-
-    var forecastState by remember {
-        mutableStateOf(false)
-    }
+    var windSpeed: Int? = null
 
     ConstraintLayout(
         modifier = Modifier
@@ -112,30 +97,26 @@ fun UpdateUi(
         ) = createRefs()
 
 
+        val weatherResponse by viewModel.currentWeather.collectAsState()
+        if (weatherResponse is Resource.Success) {
+            data = (weatherResponse as Resource.Success<CurrentWeatherResponse>).value
+            windSpeed = data?.wind?.speed?.times(60)?.times(60)?.div(1000)?.toInt()
 
-        viewModel.currentWeather.observe(mainActivity) { response ->
-            if (response is Resource.Success) {
-                weatherState = true
-                data = response.value
-                idIcon = data?.weather?.get(0)?.id
-            } else {
-                context.handleApiError(response as Resource.Failure)
-            }
+        } else if (weatherResponse is Resource.Failure) {
+            context.handleApiError(weatherResponse as Resource.Failure)
         }
 
+        val forecastResponse by viewModel.weatherForecast.collectAsState()
+        if (forecastResponse is Resource.Success) {
+            forecast = (forecastResponse as Resource.Success<FiveDaysForecastResponse>).value.list!!
 
-        viewModel.weatherForecast.observe(mainActivity) { response ->
-            if (response is Resource.Success) {
-                forecastState = true
-                forecast = response.value.list!!
-            } else {
-                context.handleApiError(response as Resource.Failure)
-            }
+        } else if (forecastResponse is Resource.Failure) {
+            context.handleApiError(forecastResponse as Resource.Failure)
         }
 
 
         Text(
-            text = isTrue(weatherState, data?.name.toString()),
+            text = data?.name.toString(),
             color = Color.White,
             fontSize = 18.sp,
             modifier = Modifier
@@ -161,11 +142,7 @@ fun UpdateUi(
 
 
         Text(
-            text = if (weatherState) {
-                "${data?.main?.temp.toString().substring(0, 2)}°C"
-            } else {
-                ""
-            },
+            text = "${data?.main?.temp.toString().substring(0, 2)}°C",
             fontSize = 90.sp,
             fontFamily = FontFamily.Serif,
             color = Color.White,
@@ -178,10 +155,9 @@ fun UpdateUi(
         )
 
         Text(
-            text = isTrue(
-                weatherState,
-                "Feels like ${data?.main?.feels_like.toString().substring(0, 2)}°C"
-            ),
+            text = "${stringResource(id = R.string.feels_like)} ${
+                data?.main?.feels_like.toString().substring(0, 2)
+            }°C",
             fontSize = 16.sp,
             color = Secondary,
             modifier = Modifier
@@ -194,7 +170,7 @@ fun UpdateUi(
 
 
         Text(
-            text = isTrue(weatherState, data?.weather?.get(0)?.main.toString()),
+            text = data?.weather?.get(0)?.main.toString(),
             fontSize = 18.sp,
             color = Hint,
             modifier = Modifier
@@ -216,9 +192,8 @@ fun UpdateUi(
                 }
         )
 
-
         Text(
-            text = isTrue(weatherState, "${data?.wind?.speed} m/s"),
+            text = "$windSpeed ${stringResource(id = R.string.km_h)}",
             fontSize = 16.sp,
             color = Secondary,
             modifier = Modifier
@@ -259,7 +234,9 @@ fun UpdateUi(
 
 
         Text(
-            text = isTrue(weatherState, "Visibility ${data?.visibility?.div(1000)} km"),
+            text = "${stringResource(id = R.string.visibility)} ${data?.visibility?.div(1000)} ${
+                stringResource(id = R.string.km)
+            }",
             fontSize = 16.sp,
             color = Secondary,
             modifier = Modifier
@@ -287,7 +264,7 @@ fun UpdateUi(
         )
 
         Text(
-            text = "Humidity",
+            text = stringResource(R.string.humidity),
             color = Secondary,
             fontSize = 16.sp,
             modifier = Modifier.constrainAs(txtHumidity) {
@@ -298,11 +275,10 @@ fun UpdateUi(
         )
 
 
-
         Text(
             buildAnnotatedString {
                 withStyle(style = SpanStyle(color = Color.White)) {
-                    append("Today\n")
+                    append("${stringResource(id = R.string.today)}\n")
                 }
                 withStyle(style = SpanStyle(color = Secondary, fontSize = 14.sp)) {
                     append(formatDate(FORMAT_TYPE))
@@ -316,7 +292,6 @@ fun UpdateUi(
         )
 
 
-
         LazyRow(
             modifier = Modifier
                 .constrainAs(lrWeather) {
@@ -327,9 +302,7 @@ fun UpdateUi(
                 .padding(start = MEDIUM_MARGIN, end = MEDIUM_MARGIN)
         ) {
             items(forecast) {
-                if (forecastState) {
-                    ListTodayWeather(forecast = it)
-                }
+                ListTodayWeather(forecast = it)
             }
         }
     }
@@ -357,7 +330,6 @@ fun Circle(
         animation = true
     }
 
-
     Box(
         contentAlignment = Alignment.Center,
         modifier = modifier
@@ -384,13 +356,7 @@ fun Circle(
 }
 
 
-fun isTrue(state: Boolean, text: String): String {
-    return if (state) text else "loading.."
-}
-
-
 @Composable
 @Preview(showSystemUi = true)
 fun HomeScreenPreview() {
-
 }

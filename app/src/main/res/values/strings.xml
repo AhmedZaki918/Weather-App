@@ -5,4 +5,10 @@
     <string name="invalid_auth">The given data was invalid.</string>
     <string name="not_found">Sorry, something went wrong</string>
     <string name="connection_error">Please check your internet connection</string>
+    <string name="humidity">Humidity</string>
+    <string name="today">Today</string>
+    <string name="visibility">Visibility</string>
+    <string name="km">km</string>
+    <string name="km_h">km / h</string>
+    <string name="feels_like">Feels like</string>
 </resources>

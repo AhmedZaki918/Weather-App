@@ -13,8 +13,7 @@ import com.weatherapp.ui.screen.settings.SettingsScreen
 @Composable
 fun BottomNavGraph(
     navController: NavHostController,
-    viewModel: HomeViewModel,
-    mainActivity: MainActivity
+    viewModel: HomeViewModel
 ) {
 
     NavHost(
@@ -24,8 +23,7 @@ fun BottomNavGraph(
 
         composable(route = BottomBarScreen.Home.route) {
             HomeScreen(
-                viewModel = viewModel,
-                mainActivity = mainActivity
+                viewModel = viewModel
             )
         }
         composable(route = BottomBarScreen.Search.route) {
