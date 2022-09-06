@@ -15,6 +15,7 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import coil.annotation.ExperimentalCoilApi
 import coil.compose.rememberImagePainter
 import com.weatherapp.data.model.forecast.ListItem
+import com.weatherapp.data.model.forecast.WeatherItem
 import com.weatherapp.ui.theme.ListContent
 import com.weatherapp.ui.theme.SMALL_MARGIN
 import com.weatherapp.ui.theme.Secondary

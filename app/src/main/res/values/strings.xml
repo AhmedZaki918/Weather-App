@@ -11,4 +11,7 @@
     <string name="km">km</string>
     <string name="km_h">km / h</string>
     <string name="feels_like">Feels like</string>
+    <string name="search">Search</string>
+    <string name="search_caption">Find the city name or state code that you want to know the detailed weather info at this time</string>
+    <string name="five_days_forecast">5 days weather</string>
 </resources>

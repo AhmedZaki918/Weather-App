@@ -1,6 +1,7 @@
 package com.weatherapp.navigation
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
@@ -21,6 +22,12 @@ sealed class BottomBarScreen(
         route = "search",
         title = "Search",
         icon = Icons.Default.Search
+    )
+
+    object Wishlist: BottomBarScreen(
+        route = "wishlist",
+        title = "Wishlist",
+        icon = Icons.Default.Favorite
     )
 
     object Settings : BottomBarScreen(

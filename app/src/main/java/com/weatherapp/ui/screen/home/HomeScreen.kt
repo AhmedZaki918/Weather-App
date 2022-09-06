@@ -1,23 +1,24 @@
 package com.weatherapp.ui.screen.home
 
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
-import androidx.compose.foundation.*
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -25,22 +26,18 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.withStyle
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import coil.annotation.ExperimentalCoilApi
 import coil.compose.rememberImagePainter
-import com.weatherapp.R
-import com.weatherapp.RequestState
+import com.weatherapp.*
 import com.weatherapp.data.local.Constants.FORMAT_TYPE
 import com.weatherapp.data.model.forecast.FiveDaysForecastResponse
 import com.weatherapp.data.model.forecast.ListItem
 import com.weatherapp.data.model.weather.CurrentWeatherResponse
 import com.weatherapp.data.network.Resource
 import com.weatherapp.data.viewmodel.HomeViewModel
-import com.weatherapp.formatDate
-import com.weatherapp.handleApiError
 import com.weatherapp.ui.theme.*
 
 @Composable
@@ -93,7 +90,7 @@ fun UpdateUi(
         val (
             icLocation, txtLocation, txtTemperature, txtFeelsLike, txtWeather,
             icWind, txtWind, ivWeather, txtVisibility, icVisibility,
-            boxHumidityPercentage, txtHumidity, txtDate, lrWeather
+            boxHumidityPercentage, txtHumidity, txtDate, lrWeather, icWishlist
         ) = createRefs()
 
 
@@ -113,6 +110,8 @@ fun UpdateUi(
         } else if (forecastResponse is Resource.Failure) {
             context.handleApiError(forecastResponse as Resource.Failure)
         }
+
+
 
 
         Text(
@@ -306,57 +305,4 @@ fun UpdateUi(
             }
         }
     }
-}
-
-
-@Composable
-fun Circle(
-    modifier: Modifier,
-    percentage: Float
-) {
-    var animation by remember {
-        mutableStateOf(false)
-    }
-
-    val currentPercentage = animateFloatAsState(
-        targetValue = if (animation) percentage else 0f,
-        animationSpec = tween(
-            durationMillis = 1000,
-            delayMillis = 0
-        )
-    )
-
-    LaunchedEffect(key1 = true) {
-        animation = true
-    }
-
-    Box(
-        contentAlignment = Alignment.Center,
-        modifier = modifier
-            .size(50.dp * 2f)
-    ) {
-        Canvas(
-            modifier = Modifier
-                .size(50.dp * 2f)
-        ) {
-            drawArc(
-                color = Hint,
-                -90f,
-                360 * currentPercentage.value,
-                useCenter = false,
-                style = Stroke(4.dp.toPx(), cap = StrokeCap.Round)
-            )
-        }
-        Text(
-            text = (currentPercentage.value * 100).toInt().toString() + "%",
-            color = Color.White,
-            fontSize = 20.sp,
-        )
-    }
-}
-
-
-@Composable
-@Preview(showSystemUi = true)
-fun HomeScreenPreview() {
 }

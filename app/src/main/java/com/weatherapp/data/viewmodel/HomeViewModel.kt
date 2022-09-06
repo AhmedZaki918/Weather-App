@@ -35,6 +35,9 @@ class HomeViewModel @Inject constructor(
         initFiveDaysForecast()
     }
 
+
+    fun displayDummy() = repo.displayDummyData()
+
      private fun initCurrentWeather() {
         viewModelScope.launch {
             _currentWeather.value = repo.getCurrentWeather()
