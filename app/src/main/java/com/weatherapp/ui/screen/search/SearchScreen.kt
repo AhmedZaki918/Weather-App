@@ -1,5 +1,6 @@
 package com.weatherapp.ui.screen.search
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -13,26 +14,92 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
-import com.weatherapp.Circle
+import androidx.navigation.NavHostController
+import coil.annotation.ExperimentalCoilApi
+import coil.compose.rememberImagePainter
 import com.weatherapp.R
-import com.weatherapp.data.viewmodel.HomeViewModel
+import com.weatherapp.data.local.Constants.ERROR_SCREEN
+import com.weatherapp.data.model.forecast.FiveDaysForecastResponse
+import com.weatherapp.data.model.forecast.ListItem
+import com.weatherapp.data.model.geocoding.GeocodingResponse
+import com.weatherapp.data.model.weather.CurrentWeatherResponse
+import com.weatherapp.data.network.Resource
+import com.weatherapp.data.viewmodel.SearchViewModel
 import com.weatherapp.ui.theme.*
+import com.weatherapp.util.Circle
+import com.weatherapp.util.RequestState
+import com.weatherapp.util.handleApiError
 
 @Composable
-fun SearchScreen(viewModel: HomeViewModel) {
+fun SearchScreen(
+    viewModel: SearchViewModel,
+    navController: NavHostController
+) {
+
+    var windSpeed: Int? = null
+    var forecast: List<ListItem> = listOf()
+    var currentWeather: CurrentWeatherResponse? = null
+    val context = LocalContext.current
+
+
+    if (viewModel.requestState.value == RequestState.COMPLETE) {
+
+        val geocodingResponse by viewModel.geocoding.collectAsState()
+        val weatherResponse by viewModel.currentWeather.collectAsState()
+        val forecastResponse by viewModel.weatherForecast.collectAsState()
+
+        if (geocodingResponse is Resource.Success) {
+            val response = geocodingResponse as Resource.Success<List<GeocodingResponse>>
+            response.value.also { geocoding ->
+                if (geocoding.isNotEmpty()) {
+                    val lat = geocoding[0].lat ?: 0.0
+                    val lon = geocoding[0].lon ?: 0.0
+                    viewModel.apply {
+                        initCurrentWeather(lat, lon)
+                        initFiveDaysForecast(lat, lon)
+                    }
+                } else {
+                    DisplayInvalidSearch(navController, viewModel)
+                }
+            }
+        } else if (geocodingResponse is Resource.Failure) {
+            context.handleApiError(geocodingResponse as Resource.Failure)
+            viewModel.requestState.value = RequestState.IDLE
+        }
+
+
+        if (weatherResponse is Resource.Success) {
+            currentWeather = (weatherResponse as Resource.Success<CurrentWeatherResponse>).value
+            windSpeed = currentWeather.wind?.speed?.times(60)?.times(60)?.div(1000)?.toInt()
+        } else if (weatherResponse is Resource.Failure) {
+            context.handleApiError(weatherResponse as Resource.Failure)
+        }
+
+
+        if (forecastResponse is Resource.Success) {
+            forecast = (forecastResponse as Resource.Success<FiveDaysForecastResponse>).value.list!!
+        } else if (forecastResponse is Resource.Failure) {
+            context.handleApiError(forecastResponse as Resource.Failure)
+        }
+    }
+
 
     LazyColumn(
         modifier = Modifier
@@ -41,20 +108,30 @@ fun SearchScreen(viewModel: HomeViewModel) {
             .padding(bottom = BIG_MARGIN)
     ) {
         item {
-            Header()
+            Header(viewModel, currentWeather, windSpeed)
         }
-        items(viewModel.displayDummy()) {
+        items(forecast) {
             ListWeatherForecast(forecast = it)
         }
     }
 }
 
+
+@ExperimentalCoilApi
 @Composable
-fun Header() {
+fun Header(
+    viewModel: SearchViewModel,
+    current: CurrentWeatherResponse?,
+    windSpeed: Int?
+) {
 
     ConstraintLayout(modifier = Modifier.fillMaxSize()) {
-        val (txtLabel, txtDescription, search, txtLocation, txtTemp, txtWeather, icWeather, icWind, txtWind,
-            txtVisibility, icVisibility, boxHumidityPercentage, txtHumidity, spacer) = createRefs()
+        val (txtLabel, txtDescription, search, txtLocation,
+            txtTemp, txtWeather, icWeather, icWind,
+            txtWind, txtVisibility, icVisibility,
+            boxHumidityPercentage, txtHumidity, spacer) = createRefs()
+
+        val searchTextState by viewModel.searchTextState
 
         Text(
             text = stringResource(R.string.search),
@@ -92,132 +169,158 @@ fun Header() {
                     end.linkTo(parent.end)
                 }
                 .background(StatusBar),
-            text = "",
-            onTextChange = {},
-            onCloseClicked = {},
-            onSearchClicked = {}
-        )
-
-        Text(
-            text = "Cairo",
-            fontSize = 30.sp,
-            color = Secondary,
-            modifier = Modifier
-                .constrainAs(txtLocation) {
-                    start.linkTo(parent.start, LARGE_MARGIN)
-                    top.linkTo(search.bottom, BIG_MARGIN)
+            text = searchTextState,
+            onTextChange = { newText ->
+                viewModel.searchTextState.value = newText
+            },
+            onSearchClicked = {
+                if (it.isNotEmpty()) {
+                    viewModel.initGeocoding(it)
                 }
-        )
-
-        Text(
-            text = "18°",
-            fontFamily = FontFamily.Serif,
-            fontSize = 90.sp,
-            color = Color.White,
-            modifier = Modifier
-                .constrainAs(txtTemp) {
-                    start.linkTo(parent.start, LARGE_MARGIN)
-                    top.linkTo(txtLocation.bottom, SMALL_MARGIN)
-                }
-        )
-
-        Text(
-            text = "Clear",
-            fontSize = 18.sp,
-            color = Hint,
-            modifier = Modifier
-                .constrainAs(txtWeather) {
-                    start.linkTo(txtTemp.start, MEDIUM_MARGIN)
-                    top.linkTo(txtTemp.bottom, VERY_SMALL_MARGIN)
-                }
-        )
-
-        Icon(
-            painter = painterResource(id = R.drawable.preview_cloudy),
-            contentDescription = "",
-            tint = Secondary,
-            modifier = Modifier
-                .constrainAs(icWeather) {
-                    top.linkTo(txtTemp.top)
-                    bottom.linkTo(txtTemp.bottom)
-                    start.linkTo(txtTemp.end)
-                    end.linkTo(parent.end)
-                }
-                .size(100.dp)
-        )
-
-        Icon(
-            painter = painterResource(id = R.drawable.ic_outline_wind),
-            contentDescription = "",
-            tint = Hint,
-            modifier = Modifier
-                .constrainAs(icWind) {
-                    top.linkTo(txtWeather.bottom, MEDIUM_MARGIN)
-                    start.linkTo(icVisibility.start)
-                }
-        )
-
-        Text(
-            text = "16 km / h",
-            fontSize = 16.sp,
-            color = Secondary,
-            modifier = Modifier
-                .constrainAs(txtWind) {
-                    top.linkTo(icWind.top)
-                    start.linkTo(icWind.end, SMALL_MARGIN)
-                }
-        )
-
-        Icon(
-            painter = painterResource(id = R.drawable.ic_outline_visibility),
-            contentDescription = "",
-            tint = Hint,
-            modifier = Modifier
-                .constrainAs(icVisibility) {
-                    top.linkTo(icWind.bottom, MEDIUM_MARGIN)
-                    end.linkTo(txtVisibility.start, SMALL_MARGIN)
-                }
-        )
-
-        Text(
-            text = "Visibility 10 km",
-            fontSize = 16.sp,
-            color = Secondary,
-            modifier = Modifier
-                .constrainAs(txtVisibility) {
-                    top.linkTo(icVisibility.top)
-                    end.linkTo(parent.end, LARGE_MARGIN)
-                }
-        )
-
-
-        Circle(
-            modifier = Modifier
-                .constrainAs(boxHumidityPercentage) {
-                    top.linkTo(icWind.bottom, LARGE_MARGIN)
-                    start.linkTo(parent.start, LARGE_MARGIN)
-                },
-            0.45f
-        )
-
-        Text(
-            text = stringResource(R.string.humidity),
-            color = Secondary,
-            fontSize = 16.sp,
-            modifier = Modifier.constrainAs(txtHumidity) {
-                start.linkTo(boxHumidityPercentage.end, MEDIUM_MARGIN)
-                top.linkTo(boxHumidityPercentage.top)
-                bottom.linkTo(boxHumidityPercentage.bottom)
             }
         )
 
 
-        Spacer(
-            modifier = Modifier
-                .constrainAs(spacer) {
-                    top.linkTo(boxHumidityPercentage.bottom, LARGE_MARGIN)
-                    start.linkTo(parent.start)
-                })
+        if (current != null) {
+
+            Text(
+                text = current.name.toString(),
+                fontSize = 30.sp,
+                color = Secondary,
+                modifier = Modifier
+                    .constrainAs(txtLocation) {
+                        start.linkTo(parent.start, LARGE_MARGIN)
+                        top.linkTo(search.bottom, BIG_MARGIN)
+                    }
+            )
+
+
+            Text(
+                text = "${current.main?.temp.toString().substring(0, 2)}°",
+                fontFamily = FontFamily.Serif,
+                fontSize = 90.sp,
+                color = Color.White,
+                modifier = Modifier
+                    .constrainAs(txtTemp) {
+                        start.linkTo(parent.start, LARGE_MARGIN)
+                        top.linkTo(txtLocation.bottom, SMALL_MARGIN)
+                    }
+            )
+
+
+            Text(
+                text = current.weather?.get(0)?.main.toString(),
+                fontSize = 18.sp,
+                color = Hint,
+                modifier = Modifier
+                    .constrainAs(txtWeather) {
+                        start.linkTo(txtTemp.start, MEDIUM_MARGIN)
+                        top.linkTo(txtTemp.bottom, VERY_SMALL_MARGIN)
+                    }
+            )
+
+
+            Image(
+                painter = rememberImagePainter(
+                    data = "http://openweathermap.org/img/wn/${
+                        current.weather?.get(
+                            0
+                        )?.icon
+                    }@2x.png"
+                ),
+                contentDescription = "",
+                modifier = Modifier
+                    .constrainAs(icWeather) {
+                        top.linkTo(txtTemp.top)
+                        bottom.linkTo(txtTemp.bottom)
+                        start.linkTo(txtTemp.end)
+                        end.linkTo(parent.end)
+                    }
+                    .size(100.dp)
+            )
+
+
+            Icon(
+                painter = painterResource(id = R.drawable.ic_outline_wind),
+                contentDescription = "",
+                tint = Hint,
+                modifier = Modifier
+                    .constrainAs(icWind) {
+                        top.linkTo(txtWeather.bottom, MEDIUM_MARGIN)
+                        start.linkTo(icVisibility.start)
+                    }
+            )
+
+            Icon(
+                painter = painterResource(id = R.drawable.ic_outline_visibility),
+                contentDescription = "",
+                tint = Hint,
+                modifier = Modifier
+                    .constrainAs(icVisibility) {
+                        top.linkTo(icWind.bottom, MEDIUM_MARGIN)
+                        end.linkTo(txtVisibility.start, SMALL_MARGIN)
+                    }
+            )
+
+
+            Text(
+                text = "$windSpeed ${stringResource(id = R.string.km_h)}",
+                fontSize = 16.sp,
+                color = Secondary,
+                modifier = Modifier
+                    .constrainAs(txtWind) {
+                        top.linkTo(icWind.top)
+                        start.linkTo(icWind.end, SMALL_MARGIN)
+                    }
+            )
+
+
+            Text(
+                text = "${stringResource(id = R.string.visibility)} ${current.visibility?.div(1000)} ${
+                    stringResource(
+                        id = R.string.km
+                    )
+                }",
+                fontSize = 16.sp,
+                color = Secondary,
+                modifier = Modifier
+                    .constrainAs(txtVisibility) {
+                        top.linkTo(icVisibility.top)
+                        end.linkTo(parent.end, LARGE_MARGIN)
+                    }
+            )
+
+            Circle(
+                modifier = Modifier
+                    .constrainAs(boxHumidityPercentage) {
+                        top.linkTo(icWind.bottom, LARGE_MARGIN)
+                        start.linkTo(parent.start, LARGE_MARGIN)
+                    },
+                if (current.main?.humidity != null) {
+                    current.main.humidity.toDouble().div(100).toFloat()
+                } else {
+                    0f
+                }
+            )
+
+            Text(
+                text = stringResource(R.string.humidity),
+                color = Secondary,
+                fontSize = 16.sp,
+                modifier = Modifier.constrainAs(txtHumidity) {
+                    start.linkTo(boxHumidityPercentage.end, MEDIUM_MARGIN)
+                    top.linkTo(boxHumidityPercentage.top)
+                    bottom.linkTo(boxHumidityPercentage.bottom)
+                }
+            )
+
+            Spacer(
+                modifier = Modifier
+                    .constrainAs(spacer) {
+                        top.linkTo(boxHumidityPercentage.bottom, LARGE_MARGIN)
+                        start.linkTo(parent.start)
+                    })
+        }
     }
 }
 
@@ -227,32 +330,32 @@ fun SearchBar(
     modifier: Modifier,
     text: String,
     onTextChange: (String) -> Unit,
-    onCloseClicked: () -> Unit,
     onSearchClicked: (String) -> Unit
 ) {
-
-    var userText by remember {
-        mutableStateOf("")
-    }
+    val focusManager = LocalFocusManager.current
 
     TextField(
         modifier = modifier,
-        value = userText,
+        value = text,
         onValueChange = {
-            userText = it
+            onTextChange(it)
         },
         placeholder = {
             Text(
                 modifier = Modifier
                     .alpha(ContentAlpha.medium),
-                text = "Search",
+                text = stringResource(id = R.string.search),
                 color = Color.White
             )
         },
+        textStyle = TextStyle(color = Secondary),
         singleLine = true,
         leadingIcon = {
             IconButton(modifier = Modifier.alpha(ContentAlpha.disabled),
-                onClick = { }) {
+                onClick = {
+                    onSearchClicked(text)
+                    focusManager.clearFocus()
+                }) {
                 Icon(
                     imageVector = Icons.Filled.Search,
                     tint = Secondary,
@@ -263,7 +366,9 @@ fun SearchBar(
         trailingIcon = {
             IconButton(modifier = Modifier.alpha(ContentAlpha.disabled),
                 onClick = {
-                    if (text.isNotEmpty()) onTextChange("") else onCloseClicked()
+                    if (text.isNotEmpty()) {
+                        onTextChange("")
+                    } else focusManager.clearFocus()
                 }
             ) {
                 Icon(
@@ -279,13 +384,24 @@ fun SearchBar(
         keyboardActions = KeyboardActions(
             onSearch = {
                 onSearchClicked(text)
+                focusManager.clearFocus()
             }
         )
     )
 }
 
 
-@Preview(showSystemUi = true)
 @Composable
-fun SearchScreenPreview() {
+fun DisplayInvalidSearch(
+    navController: NavHostController,
+    viewModel: SearchViewModel
+) {
+    navController.navigate(
+        "$ERROR_SCREEN/${stringResource(id = R.string.error)}/${
+            stringResource(
+                id = R.string.invalid_city
+            )
+        }/${stringResource(id = R.string.ok)}"
+    )
+    viewModel.requestState.value = RequestState.IDLE
 }

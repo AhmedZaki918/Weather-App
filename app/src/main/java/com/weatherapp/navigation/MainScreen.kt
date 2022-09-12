@@ -13,21 +13,24 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.weatherapp.data.viewmodel.HomeViewModel
+import com.weatherapp.data.viewmodel.SearchViewModel
 import com.weatherapp.ui.theme.StatusBar
 
 
 @Composable
 fun MainScreen(
-    viewModel: HomeViewModel
+    homeViewModel: HomeViewModel,
+    searchViewModel: SearchViewModel
 ) {
 
     val navController = rememberNavController()
     Scaffold(
         bottomBar = { BottomBar(navController = navController) }
     ) {
-        BottomNavGraph(
+        NavGraph(
             navController = navController,
-            viewModel = viewModel
+            homeViewModel = homeViewModel,
+            searchViewModel = searchViewModel
         )
     }
 }

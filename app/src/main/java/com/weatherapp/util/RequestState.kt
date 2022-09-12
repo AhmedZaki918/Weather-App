@@ -1,6 +1,6 @@
-package com.weatherapp
+package com.weatherapp.util
 
 enum class RequestState {
-    LOADING,
+    IDLE,
     COMPLETE
 }

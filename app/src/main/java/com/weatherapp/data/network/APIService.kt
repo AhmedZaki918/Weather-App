@@ -1,6 +1,7 @@
 package com.weatherapp.data.network
 
 import com.weatherapp.data.model.forecast.FiveDaysForecastResponse
+import com.weatherapp.data.model.geocoding.GeocodingResponse
 import com.weatherapp.data.model.weather.CurrentWeatherResponse
 import retrofit2.http.GET
 import retrofit2.http.Query
@@ -26,4 +27,11 @@ interface APIService {
         @Query("units") units: String,
         @Query("lang") lang: String = "en"
     ): FiveDaysForecastResponse
+
+
+    @GET("geo/1.0/direct")
+    suspend fun getGeocoding(
+        @Query("appid") apiKey: String,
+        @Query("q") city: String
+    ): List<GeocodingResponse>
 }

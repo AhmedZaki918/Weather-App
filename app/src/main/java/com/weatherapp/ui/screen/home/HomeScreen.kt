@@ -31,7 +31,7 @@ import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import coil.annotation.ExperimentalCoilApi
 import coil.compose.rememberImagePainter
-import com.weatherapp.*
+import com.weatherapp.R
 import com.weatherapp.data.local.Constants.FORMAT_TYPE
 import com.weatherapp.data.model.forecast.FiveDaysForecastResponse
 import com.weatherapp.data.model.forecast.ListItem
@@ -39,13 +39,17 @@ import com.weatherapp.data.model.weather.CurrentWeatherResponse
 import com.weatherapp.data.network.Resource
 import com.weatherapp.data.viewmodel.HomeViewModel
 import com.weatherapp.ui.theme.*
+import com.weatherapp.util.Circle
+import com.weatherapp.util.RequestState
+import com.weatherapp.util.formatDate
+import com.weatherapp.util.handleApiError
 
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel
 ) {
 
-    if (viewModel.requestState.value == RequestState.LOADING) {
+    if (viewModel.requestState.value == RequestState.IDLE) {
         LoadingScreen()
     } else {
         UpdateUi(viewModel)
@@ -76,7 +80,6 @@ fun UpdateUi(
     val scrollState = rememberScrollState()
     var data: CurrentWeatherResponse? = null
     var forecast: List<ListItem> = listOf()
-
     var windSpeed: Int? = null
 
     ConstraintLayout(
@@ -90,7 +93,7 @@ fun UpdateUi(
         val (
             icLocation, txtLocation, txtTemperature, txtFeelsLike, txtWeather,
             icWind, txtWind, ivWeather, txtVisibility, icVisibility,
-            boxHumidityPercentage, txtHumidity, txtDate, lrWeather, icWishlist
+            boxHumidityPercentage, txtHumidity, txtDate, lrWeather
         ) = createRefs()
 
 
@@ -112,196 +115,197 @@ fun UpdateUi(
         }
 
 
+        if (data != null) {
+
+            Text(
+                text = data?.name.toString(),
+                color = Color.White,
+                fontSize = 18.sp,
+                modifier = Modifier
+                    .constrainAs(txtLocation) {
+                        top.linkTo(parent.top, BIG_MARGIN)
+                        start.linkTo(parent.start)
+                        end.linkTo(parent.end)
+                    }
+            )
 
 
-        Text(
-            text = data?.name.toString(),
-            color = Color.White,
-            fontSize = 18.sp,
-            modifier = Modifier
-                .constrainAs(txtLocation) {
-                    top.linkTo(parent.top, BIG_MARGIN)
-                    start.linkTo(parent.start)
-                    end.linkTo(parent.end)
+            Icon(
+                painter = painterResource(id = R.drawable.ic_outline_location),
+                contentDescription = "",
+                tint = Color.White,
+                modifier = Modifier
+                    .constrainAs(icLocation) {
+                        top.linkTo(txtLocation.top)
+                        bottom.linkTo(txtLocation.bottom)
+                        end.linkTo(txtLocation.start, SMALL_MARGIN)
+                    }
+            )
+
+
+            Text(
+                text = "${data?.main?.temp.toString().substring(0, 2)}°C",
+                fontSize = 90.sp,
+                fontFamily = FontFamily.Serif,
+                color = Color.White,
+                modifier = Modifier
+                    .constrainAs(txtTemperature) {
+                        top.linkTo(txtLocation.bottom, 50.dp)
+                        start.linkTo(parent.start)
+                        end.linkTo(parent.end)
+                    }
+            )
+
+            Text(
+                text = "${stringResource(id = R.string.feels_like)} ${
+                    data?.main?.feels_like.toString().substring(0, 2)
+                }°C",
+                fontSize = 16.sp,
+                color = Secondary,
+                modifier = Modifier
+                    .constrainAs(txtFeelsLike) {
+                        top.linkTo(txtTemperature.bottom, SMALL_MARGIN)
+                        start.linkTo(parent.start)
+                        end.linkTo(parent.end)
+                    }
+            )
+
+
+            Text(
+                text = data?.weather?.get(0)?.main.toString(),
+                fontSize = 18.sp,
+                color = Hint,
+                modifier = Modifier
+                    .constrainAs(txtWeather) {
+                        top.linkTo(txtFeelsLike.bottom, VERY_SMALL_MARGIN)
+                        start.linkTo(parent.start)
+                        end.linkTo(parent.end)
+                    }
+            )
+
+            Icon(
+                painter = painterResource(id = R.drawable.ic_outline_wind),
+                contentDescription = "",
+                tint = Hint,
+                modifier = Modifier
+                    .constrainAs(icWind) {
+                        top.linkTo(ivWeather.bottom, LARGE_MARGIN)
+                        start.linkTo(parent.start, LARGE_MARGIN)
+                    }
+            )
+
+            Text(
+                text = "$windSpeed ${stringResource(id = R.string.km_h)}",
+                fontSize = 16.sp,
+                color = Secondary,
+                modifier = Modifier
+                    .constrainAs(txtWind) {
+                        top.linkTo(icWind.top)
+                        start.linkTo(icWind.end, SMALL_MARGIN)
+                    }
+            )
+
+            Image(
+                painter = rememberImagePainter(
+                    data = "http://openweathermap.org/img/wn/${
+                        data?.weather?.get(
+                            0
+                        )?.icon
+                    }@2x.png"
+                ),
+                contentDescription = "",
+                modifier = Modifier
+                    .constrainAs(ivWeather) {
+                        top.linkTo(txtWeather.bottom)
+                        start.linkTo(parent.start)
+                        end.linkTo(parent.end)
+                    }
+                    .size(50.dp)
+            )
+
+            Icon(
+                painter = painterResource(id = R.drawable.ic_outline_visibility),
+                contentDescription = "",
+                tint = Hint,
+                modifier = Modifier
+                    .constrainAs(icVisibility) {
+                        top.linkTo(icWind.bottom, MEDIUM_MARGIN)
+                        start.linkTo(parent.start, LARGE_MARGIN)
+                    }
+            )
+
+
+            Text(
+                text = "${stringResource(id = R.string.visibility)} ${data?.visibility?.div(1000)} ${
+                    stringResource(id = R.string.km)
+                }",
+                fontSize = 16.sp,
+                color = Secondary,
+                modifier = Modifier
+                    .constrainAs(txtVisibility) {
+                        top.linkTo(icVisibility.top)
+                        start.linkTo(icVisibility.end, SMALL_MARGIN)
+                    }
+            )
+
+
+            Circle(
+                modifier = Modifier
+                    .constrainAs(boxHumidityPercentage) {
+                        top.linkTo(txtVisibility.bottom, MEDIUM_MARGIN)
+                        bottom.linkTo(txtDate.top, MEDIUM_MARGIN)
+                        start.linkTo(txtVisibility.end)
+                        end.linkTo(parent.end)
+                    },
+
+                if (data?.main?.humidity != null) {
+                    data?.main?.humidity?.toDouble()?.div(100)!!.toFloat()
+                } else {
+                    0f
                 }
-        )
+            )
 
-
-        Icon(
-            painter = painterResource(id = R.drawable.ic_outline_location),
-            contentDescription = "",
-            tint = Color.White,
-            modifier = Modifier
-                .constrainAs(icLocation) {
-                    top.linkTo(txtLocation.top)
-                    bottom.linkTo(txtLocation.bottom)
-                    end.linkTo(txtLocation.start, SMALL_MARGIN)
+            Text(
+                text = stringResource(R.string.humidity),
+                color = Secondary,
+                fontSize = 16.sp,
+                modifier = Modifier.constrainAs(txtHumidity) {
+                    bottom.linkTo(boxHumidityPercentage.bottom)
+                    top.linkTo(boxHumidityPercentage.top)
+                    end.linkTo(boxHumidityPercentage.start, MEDIUM_MARGIN)
                 }
-        )
+            )
 
 
-        Text(
-            text = "${data?.main?.temp.toString().substring(0, 2)}°C",
-            fontSize = 90.sp,
-            fontFamily = FontFamily.Serif,
-            color = Color.White,
-            modifier = Modifier
-                .constrainAs(txtTemperature) {
-                    top.linkTo(txtLocation.bottom, 50.dp)
-                    start.linkTo(parent.start)
-                    end.linkTo(parent.end)
-                }
-        )
-
-        Text(
-            text = "${stringResource(id = R.string.feels_like)} ${
-                data?.main?.feels_like.toString().substring(0, 2)
-            }°C",
-            fontSize = 16.sp,
-            color = Secondary,
-            modifier = Modifier
-                .constrainAs(txtFeelsLike) {
-                    top.linkTo(txtTemperature.bottom, SMALL_MARGIN)
-                    start.linkTo(parent.start)
-                    end.linkTo(parent.end)
-                }
-        )
-
-
-        Text(
-            text = data?.weather?.get(0)?.main.toString(),
-            fontSize = 18.sp,
-            color = Hint,
-            modifier = Modifier
-                .constrainAs(txtWeather) {
-                    top.linkTo(txtFeelsLike.bottom, VERY_SMALL_MARGIN)
-                    start.linkTo(parent.start)
-                    end.linkTo(parent.end)
-                }
-        )
-
-        Icon(
-            painter = painterResource(id = R.drawable.ic_outline_wind),
-            contentDescription = "",
-            tint = Hint,
-            modifier = Modifier
-                .constrainAs(icWind) {
-                    top.linkTo(ivWeather.bottom, LARGE_MARGIN)
-                    start.linkTo(parent.start, LARGE_MARGIN)
-                }
-        )
-
-        Text(
-            text = "$windSpeed ${stringResource(id = R.string.km_h)}",
-            fontSize = 16.sp,
-            color = Secondary,
-            modifier = Modifier
-                .constrainAs(txtWind) {
-                    top.linkTo(icWind.top)
-                    start.linkTo(icWind.end, SMALL_MARGIN)
-                }
-        )
-
-        Image(
-            painter = rememberImagePainter(
-                data = "http://openweathermap.org/img/wn/${
-                    data?.weather?.get(
-                        0
-                    )?.icon
-                }@2x.png"
-            ),
-            contentDescription = "",
-            modifier = Modifier
-                .constrainAs(ivWeather) {
-                    top.linkTo(txtWeather.bottom)
-                    start.linkTo(parent.start)
-                    end.linkTo(parent.end)
-                }
-                .size(50.dp)
-        )
-
-        Icon(
-            painter = painterResource(id = R.drawable.ic_outline_visibility),
-            contentDescription = "",
-            tint = Hint,
-            modifier = Modifier
-                .constrainAs(icVisibility) {
-                    top.linkTo(icWind.bottom, MEDIUM_MARGIN)
-                    start.linkTo(parent.start, LARGE_MARGIN)
-                }
-        )
-
-
-        Text(
-            text = "${stringResource(id = R.string.visibility)} ${data?.visibility?.div(1000)} ${
-                stringResource(id = R.string.km)
-            }",
-            fontSize = 16.sp,
-            color = Secondary,
-            modifier = Modifier
-                .constrainAs(txtVisibility) {
-                    top.linkTo(icVisibility.top)
-                    start.linkTo(icVisibility.end, SMALL_MARGIN)
-                }
-        )
-
-
-        Circle(
-            modifier = Modifier
-                .constrainAs(boxHumidityPercentage) {
-                    top.linkTo(txtVisibility.bottom, MEDIUM_MARGIN)
-                    bottom.linkTo(txtDate.top, MEDIUM_MARGIN)
-                    start.linkTo(txtVisibility.end)
-                    end.linkTo(parent.end)
+            Text(
+                buildAnnotatedString {
+                    withStyle(style = SpanStyle(color = Color.White)) {
+                        append("${stringResource(id = R.string.today)}\n")
+                    }
+                    withStyle(style = SpanStyle(color = Secondary, fontSize = 14.sp)) {
+                        append(formatDate(FORMAT_TYPE))
+                    }
                 },
-
-            if (data?.main?.humidity != null) {
-                data?.main?.humidity?.toDouble()?.div(100)!!.toFloat()
-            } else {
-                0f
-            }
-        )
-
-        Text(
-            text = stringResource(R.string.humidity),
-            color = Secondary,
-            fontSize = 16.sp,
-            modifier = Modifier.constrainAs(txtHumidity) {
-                bottom.linkTo(boxHumidityPercentage.bottom)
-                top.linkTo(boxHumidityPercentage.top)
-                end.linkTo(boxHumidityPercentage.start, MEDIUM_MARGIN)
-            }
-        )
+                modifier = Modifier
+                    .constrainAs(txtDate) {
+                        start.linkTo(parent.start, LARGE_MARGIN)
+                        top.linkTo(boxHumidityPercentage.bottom)
+                    }
+            )
 
 
-        Text(
-            buildAnnotatedString {
-                withStyle(style = SpanStyle(color = Color.White)) {
-                    append("${stringResource(id = R.string.today)}\n")
+            LazyRow(
+                modifier = Modifier
+                    .constrainAs(lrWeather) {
+                        top.linkTo(txtDate.bottom, MEDIUM_MARGIN)
+                        end.linkTo(parent.end)
+                        start.linkTo(parent.start)
+                    }
+                    .padding(start = MEDIUM_MARGIN, end = MEDIUM_MARGIN)
+            ) {
+                items(forecast) {
+                    ListTodayWeather(forecast = it)
                 }
-                withStyle(style = SpanStyle(color = Secondary, fontSize = 14.sp)) {
-                    append(formatDate(FORMAT_TYPE))
-                }
-            },
-            modifier = Modifier
-                .constrainAs(txtDate) {
-                    start.linkTo(parent.start, LARGE_MARGIN)
-                    top.linkTo(boxHumidityPercentage.bottom)
-                }
-        )
-
-
-        LazyRow(
-            modifier = Modifier
-                .constrainAs(lrWeather) {
-                    top.linkTo(txtDate.bottom, MEDIUM_MARGIN)
-                    end.linkTo(parent.end)
-                    start.linkTo(parent.start)
-                }
-                .padding(start = MEDIUM_MARGIN, end = MEDIUM_MARGIN)
-        ) {
-            items(forecast) {
-                ListTodayWeather(forecast = it)
             }
         }
     }

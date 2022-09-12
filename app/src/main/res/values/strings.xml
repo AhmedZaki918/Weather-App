@@ -13,5 +13,8 @@
     <string name="feels_like">Feels like</string>
     <string name="search">Search</string>
     <string name="search_caption">Find the city name or state code that you want to know the detailed weather info at this time</string>
-    <string name="five_days_forecast">5 days weather</string>
+
+    <string name="error">Error</string>
+    <string name="invalid_city">You\'ve entered invalid city name, try search again with correct name</string>
+    <string name="ok">OK</string>
 </resources>

@@ -1,4 +1,4 @@
-package com.weatherapp
+package com.weatherapp.util
 
 import android.content.Context
 import android.os.Build
@@ -17,6 +17,7 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.weatherapp.R
 import com.weatherapp.data.network.Resource
 import com.weatherapp.ui.theme.Hint
 import java.text.SimpleDateFormat
@@ -87,6 +88,7 @@ fun Circle(
         )
     }
 }
+
 
 fun Context.handleApiError(
     failure: Resource.Failure

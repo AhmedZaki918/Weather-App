@@ -8,14 +8,12 @@ import androidx.compose.material.Card
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import coil.annotation.ExperimentalCoilApi
 import coil.compose.rememberImagePainter
 import com.weatherapp.data.model.forecast.ListItem
-import com.weatherapp.data.model.forecast.WeatherItem
 import com.weatherapp.ui.theme.ListContent
 import com.weatherapp.ui.theme.SMALL_MARGIN
 import com.weatherapp.ui.theme.Secondary
@@ -23,7 +21,6 @@ import com.weatherapp.ui.theme.Secondary
 @ExperimentalCoilApi
 @Composable
 fun ListTodayWeather(forecast: ListItem) {
-
 
     Card(
         shape = RoundedCornerShape(30.dp),
@@ -36,7 +33,6 @@ fun ListTodayWeather(forecast: ListItem) {
 
         ConstraintLayout {
             val (icWeather, txtTemp, txtTime) = createRefs()
-
 
             Image(
                 painter = rememberImagePainter(
@@ -77,10 +73,4 @@ fun ListTodayWeather(forecast: ListItem) {
             )
         }
     }
-}
-
-
-@Preview
-@Composable
-fun ListTodayWeatherPreview() {
 }

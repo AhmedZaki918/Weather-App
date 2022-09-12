@@ -10,4 +10,9 @@
     <string name="km">كم</string>
     <string name="feels_like">الاحساس الفعلى</string>
     <string name="km_h">كم/س</string>
+    <string name="error">خطأ</string>
+    <string name="search">بحث</string>
+    <string name="search_caption">ابحث عن اسم المدينة أو كود المحافظة التى تريد معرفة تفاصيل الطقس عنها فى هذه اللحظة</string>
+    <string name="ok">تأكيد</string>
+    <string name="invalid_city">لقد أدخلت اسم مدينة غلط، حاول مرة أخرى بأسم صحيح</string>
 </resources>
