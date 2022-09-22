@@ -1,5 +1,6 @@
 package com.weatherapp.navigation
 
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -17,6 +18,7 @@ import com.weatherapp.ui.screen.home.HomeScreen
 import com.weatherapp.ui.screen.search.SearchScreen
 import com.weatherapp.ui.screen.settings.SettingsScreen
 
+@ExperimentalMaterialApi
 @Composable
 fun NavGraph(
     navController: NavHostController,

@@ -47,6 +47,7 @@ import com.weatherapp.util.Circle
 import com.weatherapp.util.RequestState
 import com.weatherapp.util.handleApiError
 
+@ExperimentalMaterialApi
 @Composable
 fun SearchScreen(
     viewModel: SearchViewModel,
@@ -110,6 +111,7 @@ fun SearchScreen(
         item {
             Header(viewModel, currentWeather, windSpeed)
         }
+
         items(forecast) {
             ListWeatherForecast(forecast = it)
         }
@@ -121,7 +123,7 @@ fun SearchScreen(
 @Composable
 fun Header(
     viewModel: SearchViewModel,
-    current: CurrentWeatherResponse?,
+    currentWeather: CurrentWeatherResponse?,
     windSpeed: Int?
 ) {
 
@@ -181,10 +183,10 @@ fun Header(
         )
 
 
-        if (current != null) {
+        if (currentWeather != null) {
 
             Text(
-                text = current.name.toString(),
+                text = currentWeather.name.toString(),
                 fontSize = 30.sp,
                 color = Secondary,
                 modifier = Modifier
@@ -196,7 +198,7 @@ fun Header(
 
 
             Text(
-                text = "${current.main?.temp.toString().substring(0, 2)}°",
+                text = "${currentWeather.main?.temp.toString().substring(0, 2)}°",
                 fontFamily = FontFamily.Serif,
                 fontSize = 90.sp,
                 color = Color.White,
@@ -209,7 +211,7 @@ fun Header(
 
 
             Text(
-                text = current.weather?.get(0)?.main.toString(),
+                text = currentWeather.weather?.get(0)?.main.toString(),
                 fontSize = 18.sp,
                 color = Hint,
                 modifier = Modifier
@@ -223,7 +225,7 @@ fun Header(
             Image(
                 painter = rememberImagePainter(
                     data = "http://openweathermap.org/img/wn/${
-                        current.weather?.get(
+                        currentWeather.weather?.get(
                             0
                         )?.icon
                     }@2x.png"
@@ -276,7 +278,11 @@ fun Header(
 
 
             Text(
-                text = "${stringResource(id = R.string.visibility)} ${current.visibility?.div(1000)} ${
+                text = "${stringResource(id = R.string.visibility)} ${
+                    currentWeather.visibility?.div(
+                        1000
+                    )
+                } ${
                     stringResource(
                         id = R.string.km
                     )
@@ -296,8 +302,8 @@ fun Header(
                         top.linkTo(icWind.bottom, LARGE_MARGIN)
                         start.linkTo(parent.start, LARGE_MARGIN)
                     },
-                if (current.main?.humidity != null) {
-                    current.main.humidity.toDouble().div(100).toFloat()
+                if (currentWeather.main?.humidity != null) {
+                    currentWeather.main.humidity.toDouble().div(100).toFloat()
                 } else {
                     0f
                 }

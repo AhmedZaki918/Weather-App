@@ -12,6 +12,9 @@ val Secondary = Color(0xFFcacac8)
 val Hint = Color(0xFFc6b560)
 val ListContent = Color(0xFF404244)
 val StatusBar = Color(0xFF191d22)
+val BottomSheet = Color(0xFF212226)
+
+
 
 
 

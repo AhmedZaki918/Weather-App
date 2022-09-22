@@ -4,31 +4,27 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.Divider
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import coil.compose.rememberImagePainter
 import com.weatherapp.data.model.forecast.ListItem
 import com.weatherapp.ui.theme.*
+import com.weatherapp.util.Line
 
 
 @Composable
 fun ListWeatherForecast(forecast: ListItem) {
 
-    ConstraintLayout(
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        val (txtDateTime, imageWeather, txtWeather, txtTemp, line) = createRefs()
 
+    ConstraintLayout(modifier = Modifier.fillMaxWidth()) {
+        val (txtDateTime, imageWeather, txtWeather, txtTemp, line) = createRefs()
 
         Text(
             buildAnnotatedString {
@@ -85,8 +81,7 @@ fun ListWeatherForecast(forecast: ListItem) {
                 }
         )
 
-        Divider(
-            color = Color.LightGray.copy(alpha = 0.1f), thickness = 1.dp,
+        Line(
             modifier = Modifier
                 .constrainAs(line) {
                     top.linkTo(txtDateTime.bottom, CUSTOM_MARGIN)
@@ -98,9 +93,3 @@ fun ListWeatherForecast(forecast: ListItem) {
     }
 }
 
-
-@Preview
-@Composable
-fun ListWeatherForecastPreview() {
-
-}

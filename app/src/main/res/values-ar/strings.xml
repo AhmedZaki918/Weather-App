@@ -15,4 +15,18 @@
     <string name="search_caption">ابحث عن اسم المدينة أو كود المحافظة التى تريد معرفة تفاصيل الطقس عنها فى هذه اللحظة</string>
     <string name="ok">تأكيد</string>
     <string name="invalid_city">لقد أدخلت اسم مدينة غلط، حاول مرة أخرى بأسم صحيح</string>
+    <string name="temp_unit">وحدة الحرارة</string>
+    <string name="settings">الاعدادات</string>
+    <string name="language">اللغة</string>
+    <string name="city">المدينة</string>
+    <string name="cancel">الغاء</string>
+    <string name="temperature">الحرارة</string>
+    <string name="arabic">العربية</string>
+    <string name="english">الانجليزية</string>
+    <string name="french">الفرنسية</string>
+    <string name="italy">الايطالية</string>
+    <string name="spanish">الاسبانية</string>
+    <string name="germany">الالمانية</string>
+    <string name="fahrenheit">فهرنهايت</string>
+    <string name="celsius">مئوية</string>
 </resources>

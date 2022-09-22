@@ -17,6 +17,7 @@ import com.weatherapp.data.viewmodel.SearchViewModel
 import com.weatherapp.ui.theme.StatusBar
 
 
+@ExperimentalMaterialApi
 @Composable
 fun MainScreen(
     homeViewModel: HomeViewModel,

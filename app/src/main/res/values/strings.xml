@@ -5,16 +5,38 @@
     <string name="invalid_auth">The given data was invalid.</string>
     <string name="not_found">Sorry, something went wrong</string>
     <string name="connection_error">Please check your internet connection</string>
+
+    <!-- Home Screen  -->
     <string name="humidity">Humidity</string>
     <string name="today">Today</string>
     <string name="visibility">Visibility</string>
     <string name="km">km</string>
     <string name="km_h">km / h</string>
     <string name="feels_like">Feels like</string>
+
+    <!--  Search Screen  -->
     <string name="search">Search</string>
     <string name="search_caption">Find the city name or state code that you want to know the detailed weather info at this time</string>
-
     <string name="error">Error</string>
     <string name="invalid_city">You\'ve entered invalid city name, try search again with correct name</string>
     <string name="ok">OK</string>
+
+    <!-- Settings Screen   -->
+    <string name="settings">Settings</string>
+    <string name="temp_unit">Temperature unit</string>
+    <string name="city">City</string>
+    <string name="language">Language</string>
+    <string name="cancel">Cancel</string>
+    <string name="temperature">Temperature</string>
+
+    <string name="arabic">Arabic</string>
+    <string name="english">English</string>
+    <string name="french">French</string>
+    <string name="italy">Italy</string>
+    <string name="spanish">Spanish</string>
+    <string name="germany">Germany</string>
+
+    <string name="celsius">Celsius (°C)</string>
+    <string name="fahrenheit">Fahrenheit (°F)</string>
+
 </resources>

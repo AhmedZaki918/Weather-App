@@ -12,4 +12,8 @@ object Constants {
     const val TITLE = "title"
     const val TEXT = "text"
     const val CONFIRM = "confirm"
+
+    // Bottom Sheet types on setting screen
+    const val TEMP = "temperature"
+    const val LANG = "language"
 }
