@@ -16,7 +16,7 @@ object RetrofitModule {
 
     @Provides
     @Singleton
-    fun provideClient() =
+    fun provideClient(): Retrofit =
         Retrofit.Builder()
             .baseUrl(BASE_URL)
             .addConverterFactory(GsonConverterFactory.create())
@@ -25,7 +25,7 @@ object RetrofitModule {
 
     @Provides
     @Singleton
-    fun provideApiInterface(retrofit: Retrofit) =
+    fun provideApiInterface(retrofit: Retrofit): APIService =
         retrofit.create(APIService::class.java)
 }
 

@@ -7,6 +7,7 @@ object Constants {
 
     const val FORMAT_TYPE = "dd.MM.yyyy"
     const val ERROR_SCREEN = "error"
+    const val CITY_SCREEN = "city"
 
     // Arguments for navigation
     const val TITLE = "title"

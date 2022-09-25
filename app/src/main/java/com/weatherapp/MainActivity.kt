@@ -7,6 +7,7 @@ import androidx.activity.viewModels
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
+import com.weatherapp.data.viewmodel.CityViewModel
 import com.weatherapp.data.viewmodel.HomeViewModel
 import com.weatherapp.data.viewmodel.SearchViewModel
 import com.weatherapp.navigation.MainScreen
@@ -19,6 +20,7 @@ class MainActivity : ComponentActivity() {
 
     private val homeViewModel: HomeViewModel by viewModels()
     private val searchViewModel: SearchViewModel by viewModels()
+    private val cityViewModel: CityViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -26,7 +28,9 @@ class MainActivity : ComponentActivity() {
             WeatherAppTheme {
                 MainScreen(
                     homeViewModel = homeViewModel,
-                    searchViewModel = searchViewModel
+                    searchViewModel = searchViewModel,
+                    cityViewModel = cityViewModel
+
                 )
             }
         }

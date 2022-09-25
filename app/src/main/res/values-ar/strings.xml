@@ -29,4 +29,9 @@
     <string name="germany">الالمانية</string>
     <string name="fahrenheit">فهرنهايت</string>
     <string name="celsius">مئوية</string>
+    <string name="city_caption">"اضف اسم المدينة أو كود المحافظة التى تود ان تحفظها فى الشاشة الرئيسية "</string>
+    <string name="enter_city">اسم المدينة</string>
+    <string name="add">اضافة</string>
+    <string name="suggested">مدن مقترحة</string>
+    <string name="city_saved">تم حفظها</string>
 </resources>

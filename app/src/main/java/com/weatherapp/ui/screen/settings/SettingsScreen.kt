@@ -16,7 +16,9 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.navigation.NavHostController
 import com.weatherapp.R
+import com.weatherapp.data.local.Constants.CITY_SCREEN
 import com.weatherapp.data.local.Constants.LANG
 import com.weatherapp.data.local.Constants.TEMP
 import com.weatherapp.ui.theme.*
@@ -25,7 +27,9 @@ import kotlinx.coroutines.launch
 
 @ExperimentalMaterialApi
 @Composable
-fun SettingsScreen() {
+fun SettingsScreen(
+    navController: NavHostController
+) {
 
     val scope = rememberCoroutineScope()
     val sheetState = rememberBottomSheetState(
@@ -137,7 +141,6 @@ fun SettingsScreen() {
                 .padding(start = LARGE_MARGIN, end = LARGE_MARGIN)
             )
 
-
             CustomButton(modifier = Modifier
                 .constrainAs(btnLanguage) {
                     top.linkTo(line.bottom, MEDIUM_MARGIN)
@@ -174,7 +177,9 @@ fun SettingsScreen() {
                 .padding(start = MEDIUM_MARGIN, end = MEDIUM_MARGIN)
                 .fillMaxWidth(),
                 title = stringResource(R.string.city),
-                onButtonClicked = {})
+                onButtonClicked = {
+                    navController.navigate(CITY_SCREEN)
+                })
 
             Line(modifier = Modifier
                 .constrainAs(thirdLine) {
@@ -264,6 +269,7 @@ fun BottomSheetContent(
                             .weight(8f)
                     )
 
+
                     RadioButton(
                         modifier = Modifier.weight(2f),
                         selected = (text == selectedOption),
@@ -314,7 +320,6 @@ fun BottomSheetContent(
 }
 
 
-
 @Composable
 fun CustomButton(
     modifier: Modifier,
@@ -348,5 +353,5 @@ fun CustomButton(
 @Preview
 @Composable
 fun SettingsScreenPreview() {
-    SettingsScreen()
+//    SettingsScreen()
 }
