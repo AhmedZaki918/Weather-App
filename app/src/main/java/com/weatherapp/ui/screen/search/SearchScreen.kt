@@ -184,6 +184,8 @@ fun Header(
 
 
         if (currentWeather != null) {
+            val lastIndex = currentWeather.main?.temp.toString().indexOf(".")
+
 
             Text(
                 text = currentWeather.name.toString(),
@@ -196,9 +198,8 @@ fun Header(
                     }
             )
 
-
             Text(
-                text = "${currentWeather.main?.temp.toString().substring(0, 2)}°",
+                text = "${currentWeather.main?.temp.toString().substring(0, lastIndex)}°",
                 fontFamily = FontFamily.Serif,
                 fontSize = 90.sp,
                 color = Color.White,

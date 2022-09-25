@@ -25,6 +25,8 @@ fun ListWeatherForecast(forecast: ListItem) {
 
     ConstraintLayout(modifier = Modifier.fillMaxWidth()) {
         val (txtDateTime, imageWeather, txtWeather, txtTemp, line) = createRefs()
+        val lastIndex = forecast.main?.temp.toString().indexOf(".")
+
 
         Text(
             buildAnnotatedString {
@@ -71,7 +73,7 @@ fun ListWeatherForecast(forecast: ListItem) {
 
 
         Text(
-            text = forecast.main?.temp.toString().substring(0, 2) + "°",
+            text = forecast.main?.temp.toString().substring(0, lastIndex) + "°",
             fontSize = 20.sp,
             color = Secondary,
             modifier = Modifier

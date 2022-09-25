@@ -15,6 +15,7 @@ import com.weatherapp.data.local.Constants.TITLE
 import com.weatherapp.data.viewmodel.CityViewModel
 import com.weatherapp.data.viewmodel.HomeViewModel
 import com.weatherapp.data.viewmodel.SearchViewModel
+import com.weatherapp.data.viewmodel.SettingsViewModel
 import com.weatherapp.ui.screen.ErrorScreen
 import com.weatherapp.ui.screen.city.CityScreen
 import com.weatherapp.ui.screen.home.HomeScreen
@@ -27,6 +28,7 @@ fun NavGraph(
     navController: NavHostController,
     homeViewModel: HomeViewModel,
     searchViewModel: SearchViewModel,
+    settingsViewModel: SettingsViewModel,
     cityViewModel: CityViewModel
 ) {
 
@@ -48,13 +50,15 @@ fun NavGraph(
         }
         composable(route = BottomBarScreen.Settings.route) {
             SettingsScreen(
-                navController = navController
+                navController = navController,
+                viewModel = settingsViewModel
             )
         }
 
         composable(route = CITY_SCREEN) {
             CityScreen(
-                viewModel = cityViewModel
+                viewModel = cityViewModel,
+                navController = navController
             )
         }
 

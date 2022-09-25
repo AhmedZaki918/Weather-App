@@ -45,5 +45,18 @@
     <string name="add">Add</string>
     <string name="suggested">Suggested Cities</string>
     <string name="city_saved">has been saved</string>
+    <string name="cairo">Cairo</string>
+    <string name="london">London</string>
+    <string name="paris">Paris</string>
+    <string name="san_francisco">San Francisco</string>
+    <string name="washington">Washington</string>
+    <string name="alexandria">Alexandria</string>
+    <string name="luxor">Luxor</string>
+    <string name="giza">Giza</string>
+    <string name="madrid">Madrid</string>
+    <string name="saint_petersburg">Saint Petersburg</string>
+    <string name="rome">Rome</string>
+    <string name="kuwait">Kuwait</string>
+    <string name="bilbeis">Bilbeis</string>
 
 </resources>

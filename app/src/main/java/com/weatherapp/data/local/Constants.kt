@@ -17,4 +17,8 @@ object Constants {
     // Bottom Sheet types on setting screen
     const val TEMP = "temperature"
     const val LANG = "language"
+
+    // DataStore
+    const val PREFERENCE_NAME = "weather_preferences"
+    const val PREFERENCE_KEY = "save_state"
 }

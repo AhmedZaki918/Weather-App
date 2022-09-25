@@ -10,8 +10,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.ParagraphStyle
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -21,14 +24,17 @@ import com.weatherapp.R
 import com.weatherapp.data.local.Constants.CITY_SCREEN
 import com.weatherapp.data.local.Constants.LANG
 import com.weatherapp.data.local.Constants.TEMP
+import com.weatherapp.data.viewmodel.SettingsViewModel
 import com.weatherapp.ui.theme.*
 import com.weatherapp.util.Line
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 @ExperimentalMaterialApi
 @Composable
 fun SettingsScreen(
-    navController: NavHostController
+    navController: NavHostController,
+    viewModel: SettingsViewModel
 ) {
 
     val scope = rememberCoroutineScope()
@@ -92,7 +98,6 @@ fun SettingsScreen(
         sheetPeekHeight = 0.dp
     ) {
 
-
         // This is the main content of settings screen
         ConstraintLayout(
             modifier = Modifier
@@ -103,6 +108,14 @@ fun SettingsScreen(
             val (txtSetting, btnTemp, btnLanguage, btnCity,
                 line, secondLine, thirdLine) = createRefs()
 
+            var cityState by remember {
+                mutableStateOf("")
+            }
+            LaunchedEffect(key1 = true) {
+                viewModel.readCity().collectLatest {
+                    cityState = it
+                }
+            }
 
             Text(
                 modifier = Modifier.constrainAs(txtSetting) {
@@ -124,17 +137,18 @@ fun SettingsScreen(
                 .padding(start = MEDIUM_MARGIN, end = MEDIUM_MARGIN)
                 .fillMaxWidth(),
                 title = stringResource(R.string.temp_unit),
+                "Celsius(°C)",
                 onButtonClicked = {
                     bottomSheetType = TEMP
                     scope.launch {
                         if (sheetState.isCollapsed) sheetState.expand()
                     }
-                })
-
+                }
+            )
 
             Line(modifier = Modifier
                 .constrainAs(line) {
-                    top.linkTo(btnTemp.bottom, MEDIUM_MARGIN)
+                    top.linkTo(btnTemp.bottom, SMALL_MARGIN)
                     start.linkTo(parent.start)
                     end.linkTo(parent.end)
                 }
@@ -143,24 +157,26 @@ fun SettingsScreen(
 
             CustomButton(modifier = Modifier
                 .constrainAs(btnLanguage) {
-                    top.linkTo(line.bottom, MEDIUM_MARGIN)
+                    top.linkTo(line.bottom, SMALL_MARGIN)
                     start.linkTo(parent.start)
                     end.linkTo(parent.end)
                 }
                 .padding(start = MEDIUM_MARGIN, end = MEDIUM_MARGIN)
                 .fillMaxWidth(),
                 title = stringResource(R.string.language),
+                "English",
                 onButtonClicked = {
                     bottomSheetType = LANG
                     scope.launch {
                         if (sheetState.isCollapsed) sheetState.expand()
                     }
-                })
+                }
+            )
 
 
             Line(modifier = Modifier
                 .constrainAs(secondLine) {
-                    top.linkTo(btnLanguage.bottom, MEDIUM_MARGIN)
+                    top.linkTo(btnLanguage.bottom, SMALL_MARGIN)
                     start.linkTo(parent.start)
                     end.linkTo(parent.end)
                 }
@@ -170,20 +186,23 @@ fun SettingsScreen(
 
             CustomButton(modifier = Modifier
                 .constrainAs(btnCity) {
-                    top.linkTo(secondLine.bottom, MEDIUM_MARGIN)
+                    top.linkTo(secondLine.bottom, SMALL_MARGIN)
                     start.linkTo(parent.start)
                     end.linkTo(parent.end)
                 }
                 .padding(start = MEDIUM_MARGIN, end = MEDIUM_MARGIN)
                 .fillMaxWidth(),
                 title = stringResource(R.string.city),
+                cityState,
                 onButtonClicked = {
                     navController.navigate(CITY_SCREEN)
-                })
+                }
+            )
+
 
             Line(modifier = Modifier
                 .constrainAs(thirdLine) {
-                    top.linkTo(btnCity.bottom, MEDIUM_MARGIN)
+                    top.linkTo(btnCity.bottom, SMALL_MARGIN)
                     start.linkTo(parent.start)
                     end.linkTo(parent.end)
                 }
@@ -203,7 +222,6 @@ fun BottomSheetContent(
     data: List<String>,
     languageState: MutableState<Boolean>
 ) {
-
     ConstraintLayout(
         modifier = Modifier
             .fillMaxWidth()
@@ -324,6 +342,7 @@ fun BottomSheetContent(
 fun CustomButton(
     modifier: Modifier,
     title: String,
+    selected: String,
     onButtonClicked: () -> Unit
 ) {
     Button(
@@ -333,11 +352,18 @@ fun CustomButton(
         onClick = {
             onButtonClicked()
         }) {
+
         Text(
-            modifier = Modifier.weight(9f),
-            text = title,
-            color = Secondary,
-            fontSize = 18.sp
+            buildAnnotatedString {
+                withStyle(style = ParagraphStyle(lineHeight = 18.sp)) {
+                    withStyle(style = SpanStyle(color = Secondary, fontSize = 18.sp)) {
+                        append("$title\n")
+                    }
+                    withStyle(style = SpanStyle(color = Hint, fontSize = 12.sp)) {
+                        append(selected)
+                    }
+                }
+            }, modifier = Modifier.weight(9f)
         )
 
         Image(
@@ -346,12 +372,4 @@ fun CustomButton(
             contentDescription = ""
         )
     }
-}
-
-
-@ExperimentalMaterialApi
-@Preview
-@Composable
-fun SettingsScreenPreview() {
-//    SettingsScreen()
 }

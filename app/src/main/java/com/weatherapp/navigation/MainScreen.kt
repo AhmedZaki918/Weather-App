@@ -21,6 +21,7 @@ import com.weatherapp.data.local.Constants.ERROR_SCREEN
 import com.weatherapp.data.viewmodel.CityViewModel
 import com.weatherapp.data.viewmodel.HomeViewModel
 import com.weatherapp.data.viewmodel.SearchViewModel
+import com.weatherapp.data.viewmodel.SettingsViewModel
 import com.weatherapp.ui.theme.StatusBar
 
 
@@ -29,6 +30,7 @@ import com.weatherapp.ui.theme.StatusBar
 fun MainScreen(
     homeViewModel: HomeViewModel,
     searchViewModel: SearchViewModel,
+    settingsViewModel: SettingsViewModel,
     cityViewModel: CityViewModel
 ) {
 
@@ -40,6 +42,7 @@ fun MainScreen(
             navController = navController,
             homeViewModel = homeViewModel,
             searchViewModel = searchViewModel,
+            settingsViewModel = settingsViewModel,
             cityViewModel = cityViewModel
         )
     }
@@ -68,7 +71,10 @@ fun BottomBar(navController: NavHostController) {
 
     AnimatedVisibility(visible = bottomBarState,
         content = {
-            BottomNavigation(backgroundColor = StatusBar, contentColor = Color.White) {
+            BottomNavigation(
+                backgroundColor = StatusBar,
+                contentColor = Color.White
+            ) {
                 screens.forEach { screen ->
                     AddItem(
                         screen = screen,

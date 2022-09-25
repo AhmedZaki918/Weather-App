@@ -10,46 +10,62 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.navigation.NavHostController
 import com.weatherapp.R
 import com.weatherapp.data.viewmodel.CityViewModel
 import com.weatherapp.ui.theme.*
 import com.weatherapp.util.Line
+import com.weatherapp.util.toast
 
 @ExperimentalMaterialApi
 @Composable
-fun CityScreen(viewModel: CityViewModel) {
+fun CityScreen(
+    viewModel: CityViewModel,
+    navController: NavHostController
+) {
 
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
     ) {
         item {
-            MainContent()
+            MainContent(
+                viewModel = viewModel,
+                navController = navController
+            )
         }
         items(viewModel.getAllCities()) {
-            ListItemCity(city = it)
+            ListItemCity(
+                city = it,
+                viewModel = viewModel,
+                navController = navController
+            )
         }
     }
 }
 
 
 @Composable
-fun MainContent() {
+fun MainContent(
+    viewModel: CityViewModel,
+    navController: NavHostController
+) {
     ConstraintLayout(
         modifier = Modifier
             .fillMaxSize()
             .background(HomeBackground)
     ) {
 
+        val context = LocalContext.current
         val (txtCity, txtCaption, tfCity, btnAdd, txtSuggested, line, icon) = createRefs()
-        var text by remember { mutableStateOf("") }
+        var textFieldState by remember { mutableStateOf("") }
 
         Text(
             modifier = Modifier.constrainAs(txtCity) {
@@ -84,14 +100,13 @@ fun MainContent() {
                     start.linkTo(parent.start, MEDIUM_MARGIN)
                 }
                 .background(BottomSheet),
-            value = text,
+            value = textFieldState,
             onValueChange = {
-                text = it
+                textFieldState = it
             },
             placeholder = {
                 Text(
-                    modifier = Modifier
-                        .alpha(ContentAlpha.medium),
+                    modifier = Modifier.alpha(ContentAlpha.medium),
                     text = stringResource(id = R.string.enter_city),
                     color = Color.White
                 )
@@ -103,12 +118,13 @@ fun MainContent() {
         Button(modifier = Modifier
             .constrainAs(btnAdd) {
                 top.linkTo(tfCity.top, VERY_SMALL_MARGIN)
-                end.linkTo(parent.end)
-                start.linkTo(tfCity.end)
+                start.linkTo(tfCity.end, MEDIUM_MARGIN)
             },
             colors = ButtonDefaults.buttonColors(backgroundColor = Hint),
             onClick = {
-
+                viewModel.saveCity(textFieldState)
+                context.toast("$textFieldState ${context.resources.getString(R.string.city_saved)}")
+                navController.navigateUp()
             }) {
             Text(
                 text = stringResource(id = R.string.add),
@@ -143,13 +159,10 @@ fun MainContent() {
                 start.linkTo(parent.start)
                 end.linkTo(parent.end)
             }
-            .padding(start = LARGE_MARGIN, end = LARGE_MARGIN, bottom = SMALL_MARGIN))
+            .padding(
+                start = LARGE_MARGIN,
+                end = LARGE_MARGIN,
+                bottom = SMALL_MARGIN
+            ))
     }
-}
-
-
-@Preview
-@Composable
-fun PreviewCityScreen() {
-    MainContent()
 }

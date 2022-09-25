@@ -11,12 +11,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.navigation.NavHostController
 import com.weatherapp.R
 import com.weatherapp.data.model.City
+import com.weatherapp.data.viewmodel.CityViewModel
 import com.weatherapp.ui.theme.HomeBackground
 import com.weatherapp.ui.theme.LARGE_MARGIN
 import com.weatherapp.ui.theme.MEDIUM_MARGIN
@@ -27,12 +28,18 @@ import com.weatherapp.util.toast
 
 @ExperimentalMaterialApi
 @Composable
-fun ListItemCity(city: City) {
+fun ListItemCity(
+    city: City,
+    viewModel: CityViewModel,
+    navController: NavHostController
+) {
 
     val context = LocalContext.current
     Surface(modifier = Modifier.fillMaxWidth(),
         onClick = {
+            viewModel.saveCity(city.name)
             context.toast("${city.name} ${context.resources.getString(R.string.city_saved)}")
+            navController.navigateUp()
         }) {
 
         ConstraintLayout(
@@ -76,7 +83,7 @@ fun ListItemCity(city: City) {
 @Preview
 @Composable
 fun ListItemCityPreview() {
-    ListItemCity(
-        City("Cairo"),
-    )
+//    ListItemCity(
+//        City("Cairo"),
+//    )
 }
