@@ -13,22 +13,30 @@ class SearchRepo @Inject constructor(private val api: APIService) : SafeApiCall 
         api.getGeocoding(API_KEY, city)
     }
 
-    suspend fun getCurrentWeather(lat: Double, lon: Double) = safeApiCall {
+    suspend fun getCurrentWeather(
+        lat: Double,
+        lon: Double,
+        tempUnit: String
+    ) = safeApiCall {
         api.getCurrentWeather(
             API_KEY,
             lat,
             lon,
-            "metric",
+            tempUnit,
         )
     }
 
-    suspend fun getFiveDaysForecast(lat: Double, lon: Double) = safeApiCall {
+    suspend fun getFiveDaysForecast(
+        lat: Double,
+        lon: Double,
+        tempUnit: String
+    ) = safeApiCall {
         api.getWeatherForecast(
             API_KEY,
             lat,
             lon,
             9,
-            "metric",
+            tempUnit,
         )
     }
 }

@@ -5,25 +5,39 @@ import com.weatherapp.data.network.APIService
 import com.weatherapp.data.network.SafeApiCall
 import javax.inject.Inject
 
-class HomeRepo @Inject constructor(private val api: APIService) : SafeApiCall {
+class HomeRepo @Inject constructor(
+    private val api: APIService
+) : SafeApiCall {
 
 
-    suspend fun getCurrentWeather() = safeApiCall {
+    suspend fun getGeocoding(city: String) = safeApiCall {
+        api.getGeocoding(API_KEY, city)
+    }
+
+    suspend fun getCurrentWeather(
+        lat: Double,
+        lon: Double,
+        tempUnit: String
+    ) = safeApiCall {
         api.getCurrentWeather(
             API_KEY,
-            30.3162878,
-            31.73694101738903,
-            "metric",
+            lat,
+            lon,
+            tempUnit,
         )
     }
 
-    suspend fun getFiveDaysForecast() = safeApiCall {
+    suspend fun getFiveDaysForecast(
+        lat: Double,
+        lon: Double,
+        tempUnit: String
+    ) = safeApiCall {
         api.getWeatherForecast(
             API_KEY,
-            30.3162878,
-            31.73694101738903,
+            lat,
+            lon,
             9,
-            "metric",
+            tempUnit,
         )
     }
 }

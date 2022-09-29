@@ -73,8 +73,8 @@ fun SearchScreen(
                     val lat = geocoding[0].lat ?: 0.0
                     val lon = geocoding[0].lon ?: 0.0
                     viewModel.apply {
-                        initCurrentWeather(lat, lon)
-                        initFiveDaysForecast(lat, lon)
+                        initCurrentWeather(lat, lon,tempUnit)
+                        initFiveDaysForecast(lat, lon,tempUnit)
                     }
                 } else {
                     DisplayInvalidSearch(navController, viewModel)

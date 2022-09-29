@@ -34,4 +34,17 @@
     <string name="add">اضافة</string>
     <string name="suggested">مدن مقترحة</string>
     <string name="city_saved">تم حفظها</string>
+    <string name="cairo">القاهرة</string>
+    <string name="london">لندن</string>
+    <string name="paris">باريس</string>
+    <string name="san_francisco">سان فرانسيسكو</string>
+    <string name="washington">واشنطن</string>
+    <string name="alexandria">الاسكندرية</string>
+    <string name="luxor">الأقصر</string>
+    <string name="giza">الجيزة</string>
+    <string name="madrid">مدريد</string>
+    <string name="saint_petersburg">سان بطرسبورج</string>
+    <string name="rome">روما</string>
+    <string name="kuwait">الكويت</string>
+    <string name="bilbeis">بلبيس</string>
 </resources>

@@ -13,9 +13,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -32,9 +30,13 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import coil.annotation.ExperimentalCoilApi
 import coil.compose.rememberImagePainter
 import com.weatherapp.R
+import com.weatherapp.data.local.Constants.C_UNIT
 import com.weatherapp.data.local.Constants.FORMAT_TYPE
+import com.weatherapp.data.local.Constants.F_UNIT
+import com.weatherapp.data.local.Constants.METRIC
 import com.weatherapp.data.model.forecast.FiveDaysForecastResponse
 import com.weatherapp.data.model.forecast.ListItem
+import com.weatherapp.data.model.geocoding.GeocodingResponse
 import com.weatherapp.data.model.weather.CurrentWeatherResponse
 import com.weatherapp.data.network.Resource
 import com.weatherapp.data.viewmodel.HomeViewModel
@@ -49,10 +51,37 @@ fun HomeScreen(
     viewModel: HomeViewModel
 ) {
 
-    if (viewModel.requestState.value == RequestState.IDLE) {
-        LoadingScreen()
-    } else {
-        UpdateUi(viewModel)
+    val apiError = remember {
+        mutableStateOf("")
+    }
+
+    viewModel.requestState.value.also { state ->
+        when (state) {
+            RequestState.IDLE -> {
+                LoadingScreen()
+            }
+            RequestState.COMPLETE -> {
+                UpdateUi(
+                    viewModel,
+                    apiError
+                )
+            }
+            RequestState.ERROR -> {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(HomeBackground)
+                        .padding(start = LARGE_MARGIN, end = LARGE_MARGIN),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = apiError.value,
+                        color = Secondary,
+                        fontSize = 20.sp
+                    )
+                }
+            }
+        }
     }
 }
 
@@ -73,7 +102,8 @@ fun LoadingScreen() {
 @ExperimentalCoilApi
 @Composable
 fun UpdateUi(
-    viewModel: HomeViewModel
+    viewModel: HomeViewModel,
+    apiError: MutableState<String>
 ) {
 
     val context = LocalContext.current
@@ -97,6 +127,29 @@ fun UpdateUi(
         ) = createRefs()
 
 
+        val geocodingResponse by viewModel.geocoding.collectAsState()
+        if (geocodingResponse is Resource.Success) {
+            val response = geocodingResponse as Resource.Success<List<GeocodingResponse>>
+            response.value.also { geocoding ->
+                if (geocoding.isNotEmpty()) {
+                    val lat = geocoding[0].lat ?: 0.0
+                    val lon = geocoding[0].lon ?: 0.0
+                    viewModel.apply {
+                        initCurrentWeather(lat, lon, tempUnit)
+                        initFiveDaysForecast(lat, lon, tempUnit)
+                    }
+                } else {
+                    apiError.value = context.getString(R.string.invalid_city)
+                    viewModel.requestState.value = RequestState.ERROR
+                }
+            }
+        } else if (geocodingResponse is Resource.Failure) {
+            context.handleApiError(geocodingResponse as Resource.Failure)
+            apiError.value = context.getString(R.string.connection_error)
+            viewModel.requestState.value = RequestState.ERROR
+        }
+
+
         val weatherResponse by viewModel.currentWeather.collectAsState()
         if (weatherResponse is Resource.Success) {
             data = (weatherResponse as Resource.Success<CurrentWeatherResponse>).value
@@ -105,6 +158,7 @@ fun UpdateUi(
         } else if (weatherResponse is Resource.Failure) {
             context.handleApiError(weatherResponse as Resource.Failure)
         }
+
 
         val forecastResponse by viewModel.weatherForecast.collectAsState()
         if (forecastResponse is Resource.Success) {
@@ -116,6 +170,9 @@ fun UpdateUi(
 
 
         if (data != null) {
+            val unitLetter = if (viewModel.tempUnit == METRIC) C_UNIT else F_UNIT
+            val lastIndex = data?.main?.temp.toString().indexOf(".")
+
 
             Text(
                 text = data?.name.toString(),
@@ -144,7 +201,7 @@ fun UpdateUi(
 
 
             Text(
-                text = "${data?.main?.temp.toString().substring(0, 2)}°C",
+                text = "${data?.main?.temp.toString().substring(0, lastIndex)}$unitLetter",
                 fontSize = 90.sp,
                 fontFamily = FontFamily.Serif,
                 color = Color.White,
@@ -158,8 +215,8 @@ fun UpdateUi(
 
             Text(
                 text = "${stringResource(id = R.string.feels_like)} ${
-                    data?.main?.feels_like.toString().substring(0, 2)
-                }°C",
+                    data?.main?.feels_like.toString().substring(0, lastIndex)
+                }$unitLetter",
                 fontSize = 16.sp,
                 color = Secondary,
                 modifier = Modifier

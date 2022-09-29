@@ -33,6 +33,7 @@ fun ListTodayWeather(forecast: ListItem) {
 
         ConstraintLayout {
             val (icWeather, txtTemp, txtTime) = createRefs()
+            val lastIndex = forecast.main?.temp.toString().indexOf(".")
 
             Image(
                 painter = rememberImagePainter(
@@ -50,7 +51,7 @@ fun ListTodayWeather(forecast: ListItem) {
             )
 
 
-            Text(text = forecast.main?.temp.toString().substring(0, 2) + " °",
+            Text(text = forecast.main?.temp.toString().substring(0, lastIndex) + " °",
                 color = Secondary,
                 fontSize = 16.sp,
                 modifier = Modifier

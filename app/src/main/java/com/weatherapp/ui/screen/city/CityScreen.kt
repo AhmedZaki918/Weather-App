@@ -36,7 +36,7 @@ fun CityScreen(
             .fillMaxSize()
     ) {
         item {
-            MainContent(
+            Header(
                 viewModel = viewModel,
                 navController = navController
             )
@@ -53,7 +53,7 @@ fun CityScreen(
 
 
 @Composable
-fun MainContent(
+fun Header(
     viewModel: CityViewModel,
     navController: NavHostController
 ) {

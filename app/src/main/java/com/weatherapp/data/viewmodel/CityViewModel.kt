@@ -2,6 +2,7 @@ package com.weatherapp.data.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.weatherapp.data.local.Constants.CITY_NAME
 import com.weatherapp.data.repository.CityRepo
 import com.weatherapp.util.DataStoreRepo
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -20,7 +21,7 @@ class CityViewModel @Inject constructor(
 
     fun saveCity(city: String) {
         viewModelScope.launch {
-            dataStore.writeState(city)
+            dataStore.writeState(CITY_NAME,city)
         }
     }
 }

@@ -4,21 +4,29 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.weatherapp.data.local.Constants.DEFAULT_UNIT
+import com.weatherapp.data.local.Constants.FAHRENHEIT
+import com.weatherapp.data.local.Constants.IMPERIAL
+import com.weatherapp.data.local.Constants.METRIC
+import com.weatherapp.data.local.Constants.TEMP_UNIT
 import com.weatherapp.util.RequestState
 import com.weatherapp.data.model.forecast.FiveDaysForecastResponse
 import com.weatherapp.data.model.geocoding.GeocodingResponse
 import com.weatherapp.data.model.weather.CurrentWeatherResponse
 import com.weatherapp.data.network.Resource
 import com.weatherapp.data.repository.SearchRepo
+import com.weatherapp.util.DataStoreRepo
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class SearchViewModel @Inject constructor(
-    private val repo: SearchRepo
+    private val repo: SearchRepo,
+    private val dataStoreRepo: DataStoreRepo
 ) : ViewModel() {
 
     private val _geocoding = MutableStateFlow<Resource<List<GeocodingResponse>>>(Resource.Idle)
@@ -36,6 +44,21 @@ class SearchViewModel @Inject constructor(
     val requestState: MutableState<RequestState> =
         mutableStateOf(RequestState.IDLE)
 
+    var tempUnit = ""
+
+
+    init {
+        viewModelScope.launch {
+            dataStoreRepo.readState(TEMP_UNIT).collectLatest { unit ->
+                tempUnit = when (unit) {
+                    DEFAULT_UNIT -> METRIC
+                    FAHRENHEIT -> IMPERIAL
+                    else -> METRIC
+                }
+            }
+        }
+    }
+
 
     fun initGeocoding(city: String) {
         viewModelScope.launch {
@@ -44,15 +67,15 @@ class SearchViewModel @Inject constructor(
         }
     }
 
-     fun initCurrentWeather(lat: Double, lon: Double) {
-         viewModelScope.launch {
-            _currentWeather.value = repo.getCurrentWeather(lat,lon)
-         }
-     }
+    fun initCurrentWeather(lat: Double, lon: Double, tempUnit: String) {
+        viewModelScope.launch {
+            _currentWeather.value = repo.getCurrentWeather(lat, lon, tempUnit)
+        }
+    }
 
-     fun initFiveDaysForecast(lat: Double, lon: Double) {
-         viewModelScope.launch {
-            _weatherForecast.value = repo.getFiveDaysForecast(lat,lon)
-         }
-     }
+    fun initFiveDaysForecast(lat: Double, lon: Double, tempUnit: String) {
+        viewModelScope.launch {
+            _weatherForecast.value = repo.getFiveDaysForecast(lat, lon, tempUnit)
+        }
+    }
 }
