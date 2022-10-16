@@ -3,12 +3,9 @@ package com.weatherapp.navigation
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hierarchy
@@ -16,13 +13,16 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.weatherapp.R
 import com.weatherapp.data.local.Constants.CITY_SCREEN
 import com.weatherapp.data.local.Constants.ERROR_SCREEN
+import com.weatherapp.data.local.Constants.HOME
+import com.weatherapp.data.local.Constants.SEARCH
+import com.weatherapp.data.local.Constants.WISHLIST
 import com.weatherapp.data.viewmodel.CityViewModel
 import com.weatherapp.data.viewmodel.HomeViewModel
 import com.weatherapp.data.viewmodel.SearchViewModel
 import com.weatherapp.data.viewmodel.SettingsViewModel
-import com.weatherapp.ui.theme.StatusBar
 
 
 @ExperimentalMaterialApi
@@ -31,7 +31,8 @@ fun MainScreen(
     homeViewModel: HomeViewModel,
     searchViewModel: SearchViewModel,
     settingsViewModel: SettingsViewModel,
-    cityViewModel: CityViewModel
+    cityViewModel: CityViewModel,
+    appTheme: MutableState<Boolean>
 ) {
 
     val navController = rememberNavController()
@@ -43,7 +44,8 @@ fun MainScreen(
             homeViewModel = homeViewModel,
             searchViewModel = searchViewModel,
             settingsViewModel = settingsViewModel,
-            cityViewModel = cityViewModel
+            cityViewModel = cityViewModel,
+            appTheme = appTheme
         )
     }
 }
@@ -72,8 +74,8 @@ fun BottomBar(navController: NavHostController) {
     AnimatedVisibility(visible = bottomBarState,
         content = {
             BottomNavigation(
-                backgroundColor = StatusBar,
-                contentColor = Color.White
+                backgroundColor = MaterialTheme.colors.surface,
+                contentColor = MaterialTheme.colors.primary
             ) {
                 screens.forEach { screen ->
                     AddItem(
@@ -95,7 +97,14 @@ fun RowScope.AddItem(
 
     BottomNavigationItem(
         label = {
-            Text(text = screen.title)
+            Text(
+                text = when (screen.route) {
+                    HOME -> stringResource(id = R.string.home)
+                    SEARCH -> stringResource(id = R.string.search)
+                    WISHLIST -> stringResource(id = R.string.wishlist)
+                    else -> stringResource(id = R.string.settings)
+                }
+            )
         },
         alwaysShowLabel = false,
         icon = {

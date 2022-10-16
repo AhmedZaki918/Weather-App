@@ -14,7 +14,7 @@ interface APIService {
         @Query("lat") lat: Double,
         @Query("lon") lon: Double,
         @Query("units") units: String,
-        @Query("lang") lang: String = "en"
+        @Query("lang") lang: String
     ): CurrentWeatherResponse
 
 
@@ -25,7 +25,7 @@ interface APIService {
         @Query("lon") lon: Double,
         @Query("cnt") cnt: Int,
         @Query("units") units: String,
-        @Query("lang") lang: String = "en"
+        @Query("lang") lang: String
     ): FiveDaysForecastResponse
 
 

@@ -7,12 +7,8 @@ import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
-import com.weatherapp.ui.theme.Hint
-import com.weatherapp.ui.theme.HomeBackground
-import com.weatherapp.ui.theme.Secondary
 
 @Composable
 fun ErrorScreen(
@@ -24,7 +20,7 @@ fun ErrorScreen(
 
     Box(
         modifier = Modifier
-            .background(HomeBackground)
+            .background( MaterialTheme.colors.background)
             .fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
@@ -39,7 +35,7 @@ fun ErrorScreen(
                 },
                 title = {
                     Text(
-                        text = title.toString(), color = Color.Black,
+                        text = title.toString(), color = MaterialTheme.colors.onSecondary,
                         fontSize = MaterialTheme.typography.h5.fontSize,
                         fontWeight = FontWeight.Bold
                     )
@@ -47,7 +43,7 @@ fun ErrorScreen(
                 text = {
                     Text(
                         text = text.toString(),
-                        color = Color.Black,
+                        color = MaterialTheme.colors.onSecondary,
                         fontSize = MaterialTheme.typography.subtitle1.fontSize,
                         fontWeight = FontWeight.Normal
                     )
@@ -58,12 +54,12 @@ fun ErrorScreen(
                         onClick = {
                             closeDialog()
                             openDialog = false
-                        }, colors = ButtonDefaults.buttonColors(HomeBackground)
+                        }, colors = ButtonDefaults.buttonColors( MaterialTheme.colors.background)
                     ) {
-                        Text(text = confirmButton.toString(), color = Secondary)
+                        Text(text = confirmButton.toString(), color =  MaterialTheme.colors.primaryVariant)
                     }
                 },
-                backgroundColor = Hint
+                backgroundColor = MaterialTheme.colors.secondary
             )
         }
     }

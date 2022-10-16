@@ -2,21 +2,20 @@ package com.weatherapp.ui.screen.home
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -33,7 +32,9 @@ import com.weatherapp.R
 import com.weatherapp.data.local.Constants.C_UNIT
 import com.weatherapp.data.local.Constants.FORMAT_TYPE
 import com.weatherapp.data.local.Constants.F_UNIT
+import com.weatherapp.data.local.Constants.IMAGE_URL
 import com.weatherapp.data.local.Constants.METRIC
+import com.weatherapp.data.local.Constants.SIZE
 import com.weatherapp.data.model.forecast.FiveDaysForecastResponse
 import com.weatherapp.data.model.forecast.ListItem
 import com.weatherapp.data.model.geocoding.GeocodingResponse
@@ -70,13 +71,13 @@ fun HomeScreen(
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .background(HomeBackground)
+                        .background(MaterialTheme.colors.background)
                         .padding(start = LARGE_MARGIN, end = LARGE_MARGIN),
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
                         text = apiError.value,
-                        color = Secondary,
+                        color = MaterialTheme.colors.primaryVariant,
                         fontSize = 20.sp
                     )
                 }
@@ -91,7 +92,7 @@ fun LoadingScreen() {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(HomeBackground),
+            .background(MaterialTheme.colors.background),
         contentAlignment = Alignment.Center
     ) {
         CircularProgressIndicator()
@@ -114,16 +115,16 @@ fun UpdateUi(
 
     ConstraintLayout(
         modifier = Modifier
-            .background(HomeBackground)
+            .background(MaterialTheme.colors.background)
             .fillMaxSize()
             .verticalScroll(scrollState)
             .padding(bottom = 70.dp)
     ) {
 
         val (
-            icLocation, txtLocation, txtTemperature, txtFeelsLike, txtWeather,
-            icWind, txtWind, ivWeather, txtVisibility, icVisibility,
-            boxHumidityPercentage, txtHumidity, txtDate, lrWeather
+            icLocation, txtLocation,
+            icWind, txtWind, txtVisibility, icVisibility,
+            boxHumidityPercentage, txtHumidity, txtDate, lrWeather, coContainer
         ) = createRefs()
 
 
@@ -176,7 +177,7 @@ fun UpdateUi(
 
             Text(
                 text = data?.name.toString(),
-                color = Color.White,
+                color = MaterialTheme.colors.primary,
                 fontSize = 18.sp,
                 modifier = Modifier
                     .constrainAs(txtLocation) {
@@ -190,7 +191,7 @@ fun UpdateUi(
             Icon(
                 painter = painterResource(id = R.drawable.ic_outline_location),
                 contentDescription = "",
-                tint = Color.White,
+                tint = MaterialTheme.colors.primary,
                 modifier = Modifier
                     .constrainAs(icLocation) {
                         top.linkTo(txtLocation.top)
@@ -200,53 +201,62 @@ fun UpdateUi(
             )
 
 
-            Text(
-                text = "${data?.main?.temp.toString().substring(0, lastIndex)}$unitLetter",
-                fontSize = 90.sp,
-                fontFamily = FontFamily.Serif,
-                color = Color.White,
+            Column(
                 modifier = Modifier
-                    .constrainAs(txtTemperature) {
-                        top.linkTo(txtLocation.bottom, 50.dp)
+                    .constrainAs(coContainer) {
+                        top.linkTo(icLocation.bottom, 50.dp)
                         start.linkTo(parent.start)
                         end.linkTo(parent.end)
                     }
-            )
+                    .fillMaxWidth()
+                    .padding(start = LARGE_MARGIN, end = LARGE_MARGIN)
+                    .clip( RoundedCornerShape(20.dp))
+                    .background(MaterialTheme.colors.onBackground),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
 
-            Text(
-                text = "${stringResource(id = R.string.feels_like)} ${
-                    data?.main?.feels_like.toString().substring(0, lastIndex)
-                }$unitLetter",
-                fontSize = 16.sp,
-                color = Secondary,
-                modifier = Modifier
-                    .constrainAs(txtFeelsLike) {
-                        top.linkTo(txtTemperature.bottom, SMALL_MARGIN)
-                        start.linkTo(parent.start)
-                        end.linkTo(parent.end)
-                    }
-            )
+                Text(
+                    text = "${data?.main?.temp.toString().substring(0, lastIndex)}$unitLetter",
+                    fontSize = 90.sp,
+                    fontFamily = FontFamily.Serif,
+                    color = MaterialTheme.colors.primary
+                )
+
+                Text(
+                    text = "${stringResource(id = R.string.feels_like)} ${
+                        data?.main?.feels_like.toString().substring(0, lastIndex)
+                    }$unitLetter",
+                    fontSize = 16.sp,
+                    color = MaterialTheme.colors.primaryVariant,
+                    modifier = Modifier.padding(top = SMALL_MARGIN)
+                )
 
 
-            Text(
-                text = data?.weather?.get(0)?.main.toString(),
-                fontSize = 18.sp,
-                color = Hint,
-                modifier = Modifier
-                    .constrainAs(txtWeather) {
-                        top.linkTo(txtFeelsLike.bottom, VERY_SMALL_MARGIN)
-                        start.linkTo(parent.start)
-                        end.linkTo(parent.end)
-                    }
-            )
+                Text(
+                    text = data?.weather?.get(0)?.description.toString(),
+                    fontSize = 18.sp,
+                    color = MaterialTheme.colors.secondary,
+                    modifier = Modifier.padding(top = VERY_SMALL_MARGIN)
+                )
+
+
+                Image(
+                    painter = rememberImagePainter(
+                        data = "$IMAGE_URL${data?.weather?.get(0)?.icon}$SIZE"
+                    ),
+                    contentDescription = "",
+                    modifier = Modifier.size(50.dp)
+                )
+            }
+
 
             Icon(
                 painter = painterResource(id = R.drawable.ic_outline_wind),
                 contentDescription = "",
-                tint = Hint,
+                tint = MaterialTheme.colors.secondary,
                 modifier = Modifier
                     .constrainAs(icWind) {
-                        top.linkTo(ivWeather.bottom, LARGE_MARGIN)
+                        top.linkTo(coContainer.bottom, LARGE_MARGIN)
                         start.linkTo(parent.start, LARGE_MARGIN)
                     }
             )
@@ -254,7 +264,7 @@ fun UpdateUi(
             Text(
                 text = "$windSpeed ${stringResource(id = R.string.km_h)}",
                 fontSize = 16.sp,
-                color = Secondary,
+                color = MaterialTheme.colors.primaryVariant,
                 modifier = Modifier
                     .constrainAs(txtWind) {
                         top.linkTo(icWind.top)
@@ -262,28 +272,12 @@ fun UpdateUi(
                     }
             )
 
-            Image(
-                painter = rememberImagePainter(
-                    data = "http://openweathermap.org/img/wn/${
-                        data?.weather?.get(
-                            0
-                        )?.icon
-                    }@2x.png"
-                ),
-                contentDescription = "",
-                modifier = Modifier
-                    .constrainAs(ivWeather) {
-                        top.linkTo(txtWeather.bottom)
-                        start.linkTo(parent.start)
-                        end.linkTo(parent.end)
-                    }
-                    .size(50.dp)
-            )
+
 
             Icon(
                 painter = painterResource(id = R.drawable.ic_outline_visibility),
                 contentDescription = "",
-                tint = Hint,
+                tint = MaterialTheme.colors.secondary,
                 modifier = Modifier
                     .constrainAs(icVisibility) {
                         top.linkTo(icWind.bottom, MEDIUM_MARGIN)
@@ -297,7 +291,7 @@ fun UpdateUi(
                     stringResource(id = R.string.km)
                 }",
                 fontSize = 16.sp,
-                color = Secondary,
+                color = MaterialTheme.colors.primaryVariant,
                 modifier = Modifier
                     .constrainAs(txtVisibility) {
                         top.linkTo(icVisibility.top)
@@ -319,12 +313,12 @@ fun UpdateUi(
                     data?.main?.humidity?.toDouble()?.div(100)!!.toFloat()
                 } else {
                     0f
-                }
+                }, MaterialTheme.colors.secondary
             )
 
             Text(
                 text = stringResource(R.string.humidity),
-                color = Secondary,
+                color = MaterialTheme.colors.primaryVariant,
                 fontSize = 16.sp,
                 modifier = Modifier.constrainAs(txtHumidity) {
                     bottom.linkTo(boxHumidityPercentage.bottom)
@@ -336,10 +330,19 @@ fun UpdateUi(
 
             Text(
                 buildAnnotatedString {
-                    withStyle(style = SpanStyle(color = Color.White)) {
+                    withStyle(
+                        style = SpanStyle(
+                            color = MaterialTheme.colors.primary
+                        )
+                    ) {
                         append("${stringResource(id = R.string.today)}\n")
                     }
-                    withStyle(style = SpanStyle(color = Secondary, fontSize = 14.sp)) {
+                    withStyle(
+                        style = SpanStyle(
+                            color = MaterialTheme.colors.primaryVariant,
+                            fontSize = 14.sp
+                        )
+                    ) {
                         append(formatDate(FORMAT_TYPE))
                     }
                 },

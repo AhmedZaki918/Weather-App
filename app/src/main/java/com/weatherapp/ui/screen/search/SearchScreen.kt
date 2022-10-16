@@ -19,7 +19,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
@@ -36,6 +35,8 @@ import coil.annotation.ExperimentalCoilApi
 import coil.compose.rememberImagePainter
 import com.weatherapp.R
 import com.weatherapp.data.local.Constants.ERROR_SCREEN
+import com.weatherapp.data.local.Constants.IMAGE_URL
+import com.weatherapp.data.local.Constants.SIZE
 import com.weatherapp.data.model.forecast.FiveDaysForecastResponse
 import com.weatherapp.data.model.forecast.ListItem
 import com.weatherapp.data.model.geocoding.GeocodingResponse
@@ -73,8 +74,8 @@ fun SearchScreen(
                     val lat = geocoding[0].lat ?: 0.0
                     val lon = geocoding[0].lon ?: 0.0
                     viewModel.apply {
-                        initCurrentWeather(lat, lon,tempUnit)
-                        initFiveDaysForecast(lat, lon,tempUnit)
+                        initCurrentWeather(lat, lon, tempUnit)
+                        initFiveDaysForecast(lat, lon, tempUnit)
                     }
                 } else {
                     DisplayInvalidSearch(navController, viewModel)
@@ -105,7 +106,7 @@ fun SearchScreen(
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
-            .background(HomeBackground)
+            .background(MaterialTheme.colors.background)
             .padding(bottom = BIG_MARGIN)
     ) {
         item {
@@ -138,7 +139,7 @@ fun Header(
         Text(
             text = stringResource(R.string.search),
             fontSize = 25.sp,
-            color = Color.White,
+            color = MaterialTheme.colors.primary,
             modifier = Modifier
                 .constrainAs(txtLabel) {
                     top.linkTo(parent.top, LARGE_MARGIN)
@@ -152,7 +153,7 @@ fun Header(
             fontSize = 16.sp,
             lineHeight = 25.sp,
             textAlign = TextAlign.Center,
-            color = Secondary,
+            color = MaterialTheme.colors.primaryVariant,
             modifier = Modifier
                 .constrainAs(txtDescription) {
                     top.linkTo(txtLabel.bottom, MEDIUM_MARGIN)
@@ -170,7 +171,7 @@ fun Header(
                     start.linkTo(parent.start)
                     end.linkTo(parent.end)
                 }
-                .background(StatusBar),
+                .background(MaterialTheme.colors.surface),
             text = searchTextState,
             onTextChange = { newText ->
                 viewModel.searchTextState.value = newText
@@ -190,7 +191,7 @@ fun Header(
             Text(
                 text = currentWeather.name.toString(),
                 fontSize = 30.sp,
-                color = Secondary,
+                color = MaterialTheme.colors.primaryVariant,
                 modifier = Modifier
                     .constrainAs(txtLocation) {
                         start.linkTo(parent.start, LARGE_MARGIN)
@@ -202,7 +203,7 @@ fun Header(
                 text = "${currentWeather.main?.temp.toString().substring(0, lastIndex)}°",
                 fontFamily = FontFamily.Serif,
                 fontSize = 90.sp,
-                color = Color.White,
+                color = MaterialTheme.colors.primary,
                 modifier = Modifier
                     .constrainAs(txtTemp) {
                         start.linkTo(parent.start, LARGE_MARGIN)
@@ -212,9 +213,9 @@ fun Header(
 
 
             Text(
-                text = currentWeather.weather?.get(0)?.main.toString(),
+                text = currentWeather.weather?.get(0)?.description.toString(),
                 fontSize = 18.sp,
-                color = Hint,
+                color = MaterialTheme.colors.secondary,
                 modifier = Modifier
                     .constrainAs(txtWeather) {
                         start.linkTo(txtTemp.start, MEDIUM_MARGIN)
@@ -225,11 +226,7 @@ fun Header(
 
             Image(
                 painter = rememberImagePainter(
-                    data = "http://openweathermap.org/img/wn/${
-                        currentWeather.weather?.get(
-                            0
-                        )?.icon
-                    }@2x.png"
+                    data = "$IMAGE_URL${currentWeather.weather?.get(0)?.icon}$SIZE"
                 ),
                 contentDescription = "",
                 modifier = Modifier
@@ -246,7 +243,7 @@ fun Header(
             Icon(
                 painter = painterResource(id = R.drawable.ic_outline_wind),
                 contentDescription = "",
-                tint = Hint,
+                tint = MaterialTheme.colors.secondary,
                 modifier = Modifier
                     .constrainAs(icWind) {
                         top.linkTo(txtWeather.bottom, MEDIUM_MARGIN)
@@ -257,7 +254,7 @@ fun Header(
             Icon(
                 painter = painterResource(id = R.drawable.ic_outline_visibility),
                 contentDescription = "",
-                tint = Hint,
+                tint = MaterialTheme.colors.secondary,
                 modifier = Modifier
                     .constrainAs(icVisibility) {
                         top.linkTo(icWind.bottom, MEDIUM_MARGIN)
@@ -269,7 +266,7 @@ fun Header(
             Text(
                 text = "$windSpeed ${stringResource(id = R.string.km_h)}",
                 fontSize = 16.sp,
-                color = Secondary,
+                color = MaterialTheme.colors.primaryVariant,
                 modifier = Modifier
                     .constrainAs(txtWind) {
                         top.linkTo(icWind.top)
@@ -289,7 +286,7 @@ fun Header(
                     )
                 }",
                 fontSize = 16.sp,
-                color = Secondary,
+                color = MaterialTheme.colors.primaryVariant,
                 modifier = Modifier
                     .constrainAs(txtVisibility) {
                         top.linkTo(icVisibility.top)
@@ -307,12 +304,13 @@ fun Header(
                     currentWeather.main.humidity.toDouble().div(100).toFloat()
                 } else {
                     0f
-                }
+                },
+                MaterialTheme.colors.secondary
             )
 
             Text(
                 text = stringResource(R.string.humidity),
-                color = Secondary,
+                color = MaterialTheme.colors.primaryVariant,
                 fontSize = 16.sp,
                 modifier = Modifier.constrainAs(txtHumidity) {
                     start.linkTo(boxHumidityPercentage.end, MEDIUM_MARGIN)
@@ -352,10 +350,10 @@ fun SearchBar(
                 modifier = Modifier
                     .alpha(ContentAlpha.medium),
                 text = stringResource(id = R.string.search),
-                color = Color.White
+                color = MaterialTheme.colors.primary
             )
         },
-        textStyle = TextStyle(color = Secondary),
+        textStyle = TextStyle(color = MaterialTheme.colors.primaryVariant),
         singleLine = true,
         leadingIcon = {
             IconButton(modifier = Modifier.alpha(ContentAlpha.disabled),
@@ -365,7 +363,7 @@ fun SearchBar(
                 }) {
                 Icon(
                     imageVector = Icons.Filled.Search,
-                    tint = Secondary,
+                    tint = MaterialTheme.colors.primaryVariant,
                     contentDescription = ""
                 )
             }
@@ -380,7 +378,7 @@ fun SearchBar(
             ) {
                 Icon(
                     imageVector = Icons.Filled.Close,
-                    tint = Secondary,
+                    tint = MaterialTheme.colors.primaryVariant,
                     contentDescription = ""
                 )
             }

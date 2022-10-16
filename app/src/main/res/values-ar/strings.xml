@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">WeatherApp</string>
+    <string name="app_name">طقس اليوم</string>
     <string name="invalid_auth">بيانات غير صحيحة</string>
     <string name="not_found">عذرا حدث شيئ خطأ</string>
     <string name="connection_error">تفقد اتصالك بالانترنت</string>
@@ -24,9 +24,6 @@
     <string name="arabic">العربية</string>
     <string name="english">الانجليزية</string>
     <string name="french">الفرنسية</string>
-    <string name="italy">الايطالية</string>
-    <string name="spanish">الاسبانية</string>
-    <string name="germany">الالمانية</string>
     <string name="fahrenheit">فهرنهايت</string>
     <string name="celsius">مئوية</string>
     <string name="city_caption">"اضف اسم المدينة أو كود المحافظة التى تود ان تحفظها فى الشاشة الرئيسية "</string>
@@ -43,8 +40,11 @@
     <string name="luxor">الأقصر</string>
     <string name="giza">الجيزة</string>
     <string name="madrid">مدريد</string>
-    <string name="saint_petersburg">سان بطرسبورج</string>
+    <string name="saint_petersburg">سانت بطرسبرغ</string>
     <string name="rome">روما</string>
     <string name="kuwait">الكويت</string>
     <string name="bilbeis">بلبيس</string>
+    <string name="dark_theme">تفعيل الوضع الليلى</string>
+    <string name="home">الرئيسية</string>
+    <string name="wishlist">المفضلة</string>
 </resources>

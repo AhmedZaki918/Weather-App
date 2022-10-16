@@ -3,6 +3,7 @@ package com.weatherapp.data.repository
 import com.weatherapp.data.local.Constants.API_KEY
 import com.weatherapp.data.network.APIService
 import com.weatherapp.data.network.SafeApiCall
+import com.weatherapp.util.getLocal
 import javax.inject.Inject
 
 class HomeRepo @Inject constructor(
@@ -24,6 +25,7 @@ class HomeRepo @Inject constructor(
             lat,
             lon,
             tempUnit,
+            getLocal()
         )
     }
 
@@ -38,6 +40,7 @@ class HomeRepo @Inject constructor(
             lon,
             9,
             tempUnit,
+           getLocal()
         )
     }
 }

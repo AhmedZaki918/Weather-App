@@ -3,6 +3,7 @@ package com.weatherapp.data.repository
 import com.weatherapp.data.local.Constants.API_KEY
 import com.weatherapp.data.network.APIService
 import com.weatherapp.data.network.SafeApiCall
+import com.weatherapp.util.getLocal
 import dagger.hilt.android.scopes.ViewModelScoped
 import javax.inject.Inject
 
@@ -23,6 +24,7 @@ class SearchRepo @Inject constructor(private val api: APIService) : SafeApiCall 
             lat,
             lon,
             tempUnit,
+            getLocal()
         )
     }
 
@@ -37,6 +39,7 @@ class SearchRepo @Inject constructor(private val api: APIService) : SafeApiCall 
             lon,
             9,
             tempUnit,
+           getLocal()
         )
     }
 }

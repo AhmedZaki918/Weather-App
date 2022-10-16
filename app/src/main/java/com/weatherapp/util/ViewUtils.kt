@@ -9,12 +9,12 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.Divider
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Color.Companion.LightGray
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.unit.Dp
@@ -22,7 +22,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.weatherapp.R
 import com.weatherapp.data.network.Resource
-import com.weatherapp.ui.theme.Hint
 import java.text.SimpleDateFormat
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -34,11 +33,16 @@ fun Context.toast(message: String?) {
 }
 
 
+fun getLocal(): String {
+    val lang = Locale.getDefault().language
+    return if (lang != "en" && lang != "ar")  "en" else lang
+}
+
 @Composable
 fun Line(
     modifier: Modifier,
     thickness: Dp = 1.dp,
-    color: Color =  LightGray.copy(alpha = 0.1f)
+    color: Color = MaterialTheme.colors.onSurface.copy(alpha = 0.1f)
 ) {
     Divider(
         color = color,
@@ -63,7 +67,8 @@ fun formatDate(dateFormat: String): String {
 @Composable
 fun Circle(
     modifier: Modifier,
-    percentage: Float
+    percentage: Float,
+    arcColor: Color
 ) {
     var animation by remember {
         mutableStateOf(false)
@@ -91,7 +96,7 @@ fun Circle(
                 .size(50.dp * 2f)
         ) {
             drawArc(
-                color = Hint,
+                color = arcColor,
                 -90f,
                 360 * currentPercentage.value,
                 useCenter = false,
@@ -100,7 +105,7 @@ fun Circle(
         }
         Text(
             text = (currentPercentage.value * 100).toInt().toString() + "%",
-            color = Color.White,
+            color = MaterialTheme.colors.primary,
             fontSize = 20.sp,
         )
     }

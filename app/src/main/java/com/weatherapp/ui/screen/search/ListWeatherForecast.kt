@@ -4,6 +4,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -14,8 +15,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import coil.compose.rememberImagePainter
+import com.weatherapp.data.local.Constants.DEGREE
+import com.weatherapp.data.local.Constants.IMAGE_URL
+import com.weatherapp.data.local.Constants.SIZE
 import com.weatherapp.data.model.forecast.ListItem
-import com.weatherapp.ui.theme.*
+import com.weatherapp.ui.theme.CUSTOM_MARGIN
+import com.weatherapp.ui.theme.LARGE_MARGIN
+import com.weatherapp.ui.theme.SMALL_MARGIN
 import com.weatherapp.util.Line
 
 
@@ -30,10 +36,20 @@ fun ListWeatherForecast(forecast: ListItem) {
 
         Text(
             buildAnnotatedString {
-                withStyle(style = SpanStyle(color = Secondary, fontSize = 14.sp)) {
+                withStyle(
+                    style = SpanStyle(
+                        color = MaterialTheme.colors.primaryVariant,
+                        fontSize = 14.sp
+                    )
+                ) {
                     append("${forecast.dt_txt?.substring(0, 10)}\n")
                 }
-                withStyle(style = SpanStyle(color = Hint, fontSize = 16.sp)) {
+                withStyle(
+                    style = SpanStyle(
+                        color = MaterialTheme.colors.secondary,
+                        fontSize = 16.sp
+                    )
+                ) {
                     append(forecast.dt_txt?.substring(11, 16).toString())
                 }
             },
@@ -45,9 +61,7 @@ fun ListWeatherForecast(forecast: ListItem) {
         )
 
         Image(painter = rememberImagePainter(
-            data = "http://openweathermap.org/img/wn/${
-                forecast.weather?.get(0)?.icon
-            }@2x.png"
+            data = "$IMAGE_URL${forecast.weather?.get(0)?.icon}$SIZE"
         ),
             contentDescription = "",
             modifier = Modifier
@@ -60,9 +74,9 @@ fun ListWeatherForecast(forecast: ListItem) {
         )
 
         Text(
-            text = forecast.weather?.get(0)?.main.toString(),
-            fontSize = 16.sp,
-            color = Secondary,
+            text = forecast.weather?.get(0)?.description.toString(),
+            fontSize = 14.sp,
+            color = MaterialTheme.colors.primaryVariant,
             modifier = Modifier
                 .constrainAs(txtWeather) {
                     start.linkTo(imageWeather.end, SMALL_MARGIN)
@@ -73,13 +87,13 @@ fun ListWeatherForecast(forecast: ListItem) {
 
 
         Text(
-            text = forecast.main?.temp.toString().substring(0, lastIndex) + "°",
+            text = forecast.main?.temp.toString().substring(0, lastIndex) + DEGREE,
             fontSize = 20.sp,
-            color = Secondary,
+            color = MaterialTheme.colors.primaryVariant,
             modifier = Modifier
                 .constrainAs(txtTemp) {
                     top.linkTo(txtWeather.top)
-                    end.linkTo(parent.end, BIG_MARGIN)
+                    end.linkTo(parent.end, LARGE_MARGIN)
                 }
         )
 

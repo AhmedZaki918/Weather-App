@@ -7,6 +7,7 @@
     <string name="connection_error">Please check your internet connection</string>
 
     <!-- Home Screen  -->
+    <string name="home">Home</string>
     <string name="humidity">Humidity</string>
     <string name="today">Today</string>
     <string name="visibility">Visibility</string>
@@ -32,9 +33,7 @@
     <string name="arabic">Arabic</string>
     <string name="english">English</string>
     <string name="french">French</string>
-    <string name="italy">Italy</string>
-    <string name="spanish">Spanish</string>
-    <string name="germany">Germany</string>
+
 
     <string name="celsius">Celsius (°C)</string>
     <string name="fahrenheit">Fahrenheit (°F)</string>
@@ -58,5 +57,10 @@
     <string name="rome">Rome</string>
     <string name="kuwait">Kuwait</string>
     <string name="bilbeis">Bilbeis</string>
+    <string name="dark_theme">Enable dark theme</string>
+
+    <string name="wishlist">Wishlist</string>
+
+
 
 </resources>

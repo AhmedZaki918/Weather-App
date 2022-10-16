@@ -16,16 +16,15 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.navigation.NavHostController
 import com.weatherapp.R
+import com.weatherapp.data.local.Constants.CITY_INDEX
 import com.weatherapp.data.local.Constants.CITY_NAME
 import com.weatherapp.data.local.Constants.CITY_SCREEN
-import com.weatherapp.data.local.Constants.LANG
-import com.weatherapp.data.local.Constants.TEMP
+import com.weatherapp.data.local.Constants.DARK_THEME
 import com.weatherapp.data.local.Constants.TEMP_UNIT
 import com.weatherapp.data.viewmodel.SettingsViewModel
 import com.weatherapp.ui.theme.*
@@ -37,34 +36,33 @@ import kotlinx.coroutines.launch
 @Composable
 fun SettingsScreen(
     navController: NavHostController,
-    viewModel: SettingsViewModel
+    viewModel: SettingsViewModel,
+    appTheme: MutableState<Boolean>
 ) {
 
-    val context = LocalContext.current
     val scope = rememberCoroutineScope()
-    val sheetState = rememberBottomSheetState(
-        initialValue = BottomSheetValue.Collapsed
-    )
-    val scaffoldState = rememberBottomSheetScaffoldState(
-        bottomSheetState = sheetState
-    )
-    val languageState = remember {
-        mutableStateOf(false)
-    }
-    var tempUnitState by remember {
-        mutableStateOf("")
-    }
-    var bottomSheetType by remember {
-        mutableStateOf("")
-    }
+    val sheetState = rememberBottomSheetState(initialValue = BottomSheetValue.Collapsed)
+    val scaffoldState = rememberBottomSheetScaffoldState(bottomSheetState = sheetState)
+    var tempUnitState by remember { mutableStateOf(2) }
+    var cityState by remember { mutableStateOf(-1) }
+    var cityByUserState by remember { mutableStateOf("") }
 
-    //    if (languageState.value) {
-//        //SetLocale()
-//    }
 
     LaunchedEffect(key1 = true) {
-        viewModel.readData(TEMP_UNIT).collectLatest {
-            tempUnitState = it.ifEmpty { context.getString(R.string.celsius) }
+        viewModel.retrieveInt(TEMP_UNIT).collectLatest {
+            tempUnitState = it
+        }
+    }
+
+    LaunchedEffect(key1 = true) {
+        viewModel.retrieveInt(CITY_INDEX).collectLatest {
+            cityState = it
+        }
+    }
+
+    LaunchedEffect(key1 = true) {
+        viewModel.retrieveString(CITY_NAME).collectLatest {
+            cityByUserState = it
         }
     }
 
@@ -72,44 +70,13 @@ fun SettingsScreen(
         sheetShape = Shapes.small,
         scaffoldState = scaffoldState,
         sheetContent = {
-
-            if (bottomSheetType == LANG) {
-                val languages =
-                    listOf(
-                        stringResource(R.string.arabic),
-                        stringResource(R.string.english),
-                        stringResource(R.string.french),
-                        stringResource(R.string.italy),
-                        stringResource(R.string.spanish),
-                        stringResource(R.string.germany)
-                    )
-                BottomSheetContent(
-                    stringResource(R.string.language),
-                    sheetState,
-                    550.dp,
-                    languages,
-                    languageState,
-                    viewModel,
-                    tempUnitState
-                )
-
-            } else {
-                val units = listOf(
-                    stringResource(R.string.celsius),
-                    stringResource(R.string.fahrenheit)
-                )
-                BottomSheetContent(
-                    stringResource(R.string.temperature),
-                    sheetState,
-                    290.dp,
-                    units,
-                    languageState,
-                    viewModel,
-                    tempUnitState
-                )
-            }
+            BottomSheetContent(
+                sheetState,
+                viewModel,
+                tempUnitState
+            )
         },
-        sheetBackgroundColor = BottomSheet,
+        sheetBackgroundColor = MaterialTheme.colors.surface,
         sheetPeekHeight = 0.dp
     ) {
 
@@ -117,21 +84,12 @@ fun SettingsScreen(
         ConstraintLayout(
             modifier = Modifier
                 .fillMaxSize()
-                .background(HomeBackground)
+                .background(MaterialTheme.colors.background)
         ) {
 
-            val (txtSetting, btnTemp, btnLanguage, btnCity,
+            val (txtSetting, btnTemp, btnDarkMode, btnCity,
                 line, secondLine, thirdLine) = createRefs()
 
-            var cityState by remember {
-                mutableStateOf("")
-            }
-
-            LaunchedEffect(key1 = true) {
-                viewModel.readData(CITY_NAME).collectLatest {
-                    cityState = it.ifEmpty { context.getString(R.string.cairo) }
-                }
-            }
 
 
             Text(
@@ -142,7 +100,7 @@ fun SettingsScreen(
                 },
                 text = stringResource(R.string.settings),
                 fontSize = 25.sp,
-                color = Color.White
+                color = MaterialTheme.colors.primary
             )
 
 
@@ -155,13 +113,14 @@ fun SettingsScreen(
                 .padding(start = MEDIUM_MARGIN, end = MEDIUM_MARGIN)
                 .fillMaxWidth(),
                 title = stringResource(R.string.temp_unit),
-                tempUnitState,
+                selected(index = tempUnitState),
                 onButtonClicked = {
-                    bottomSheetType = TEMP
                     scope.launch {
                         if (sheetState.isCollapsed) sheetState.expand()
                     }
-                }
+                },
+                viewModel,
+                appTheme
             )
 
             Line(modifier = Modifier
@@ -173,28 +132,31 @@ fun SettingsScreen(
                 .padding(start = LARGE_MARGIN, end = LARGE_MARGIN)
             )
 
+
             CustomButton(modifier = Modifier
-                .constrainAs(btnLanguage) {
+                .constrainAs(btnCity) {
                     top.linkTo(line.bottom, SMALL_MARGIN)
                     start.linkTo(parent.start)
                     end.linkTo(parent.end)
                 }
                 .padding(start = MEDIUM_MARGIN, end = MEDIUM_MARGIN)
                 .fillMaxWidth(),
-                title = stringResource(R.string.language),
-                "",
+                title = stringResource(R.string.city),
+                if (cityByUserState != "") {
+                    cityByUserState
+                } else {
+                    viewModel.selectedCity(cityState)
+                },
                 onButtonClicked = {
-                    bottomSheetType = LANG
-                    scope.launch {
-                        if (sheetState.isCollapsed) sheetState.expand()
-                    }
-                }
+                    navController.navigate(CITY_SCREEN)
+                },
+                viewModel,
+                appTheme
             )
-
 
             Line(modifier = Modifier
                 .constrainAs(secondLine) {
-                    top.linkTo(btnLanguage.bottom, SMALL_MARGIN)
+                    top.linkTo(btnCity.bottom, SMALL_MARGIN)
                     start.linkTo(parent.start)
                     end.linkTo(parent.end)
                 }
@@ -203,24 +165,24 @@ fun SettingsScreen(
 
 
             CustomButton(modifier = Modifier
-                .constrainAs(btnCity) {
+                .constrainAs(btnDarkMode) {
                     top.linkTo(secondLine.bottom, SMALL_MARGIN)
                     start.linkTo(parent.start)
                     end.linkTo(parent.end)
                 }
                 .padding(start = MEDIUM_MARGIN, end = MEDIUM_MARGIN)
                 .fillMaxWidth(),
-                title = stringResource(R.string.city),
-                cityState,
+                title = stringResource(R.string.dark_theme),
+                "",
                 onButtonClicked = {
-                    navController.navigate(CITY_SCREEN)
-                }
+                    appTheme.value = !appTheme.value
+                }, viewModel,
+                appTheme
             )
-
 
             Line(modifier = Modifier
                 .constrainAs(thirdLine) {
-                    top.linkTo(btnCity.bottom, SMALL_MARGIN)
+                    top.linkTo(btnDarkMode.bottom, VERY_SMALL_MARGIN)
                     start.linkTo(parent.start)
                     end.linkTo(parent.end)
                 }
@@ -234,23 +196,22 @@ fun SettingsScreen(
 @ExperimentalMaterialApi
 @Composable
 fun BottomSheetContent(
-    title: String,
     sheetState: BottomSheetState,
-    height: Dp,
-    dataType: List<String>,
-    languageState: MutableState<Boolean>,
     viewModel: SettingsViewModel,
-    tempUnitState: String
+    savedIndex: Int
 ) {
     ConstraintLayout(
         modifier = Modifier
             .fillMaxWidth()
-            .height(height)
+            .height(290.dp)
     ) {
 
         val scope = rememberCoroutineScope()
         val (txtHeader, btnFooter, rgTemperature, topHandler) = createRefs()
-        val context = LocalContext.current
+        val units = listOf(
+            stringResource(R.string.celsius),
+            stringResource(R.string.fahrenheit)
+        )
 
         Line(
             modifier = Modifier
@@ -261,7 +222,7 @@ fun BottomSheetContent(
                 }
                 .width(30.dp),
             thickness = 3.dp,
-            color = Color.LightGray.copy(alpha = 0.4f)
+            color = MaterialTheme.colors.primaryVariant.copy(alpha = 0.4f)
         )
 
         Text(
@@ -270,18 +231,17 @@ fun BottomSheetContent(
                     top.linkTo(parent.top, MEDIUM_MARGIN)
                     start.linkTo(parent.start, MEDIUM_MARGIN)
                 },
-            text = title,
-            color = Color.White,
+            text = stringResource(R.string.temperature),
+            color = MaterialTheme.colors.primary,
             fontWeight = FontWeight.Bold,
             fontSize = 18.sp,
         )
 
-        // We did this "IF STATEMENT CHECK" to avoid tempUnitState to be empty at first creation
-        // in composable and to display the right radio button as a selected value.
-        if (tempUnitState != "") {
+        // We did this "IF STATEMENT CHECK" to avoid index to be invalid value at first creation
+        // in composable and to display the right radio button as a saved value.
+        if (savedIndex != 2) {
             // Get the saved index from data store to display it in radio button.
-            val index = if (tempUnitState == stringResource(R.string.celsius)) 0 else 1
-            val (selectedOption, onOptionSelected) = remember { mutableStateOf(dataType[index]) }
+            val (selectedOption, onOptionSelected) = remember { mutableStateOf(units[savedIndex]) }
 
             Column(modifier = Modifier
                 .constrainAs(rgTemperature) {
@@ -290,7 +250,7 @@ fun BottomSheetContent(
                     end.linkTo(parent.end)
                 }
             ) {
-                dataType.forEach { text ->
+                units.forEachIndexed { index, text ->
                     Row(
                         Modifier
                             .fillMaxWidth()
@@ -298,13 +258,10 @@ fun BottomSheetContent(
                                 selected = (text == selectedOption),
                                 onClick = {
                                     onOptionSelected(text)
-                                    if (title != context.getString(R.string.language)) {
-                                        if (text != selectedOption) {
-                                            viewModel.writeData(TEMP_UNIT, text)
-                                        }
+                                    if (text != selectedOption) {
+                                        viewModel.saveInt(TEMP_UNIT, index)
                                     }
                                     scope.launch { sheetState.collapse() }
-//                                languageState.value = true
                                 }
                             )
                             .padding(horizontal = MEDIUM_MARGIN)
@@ -312,7 +269,7 @@ fun BottomSheetContent(
 
                         Text(
                             text = text,
-                            color = Secondary,
+                            color = MaterialTheme.colors.primaryVariant,
                             style = MaterialTheme.typography.body1.merge(),
                             modifier = Modifier
                                 .padding(start = MEDIUM_MARGIN, top = MEDIUM_MARGIN)
@@ -325,21 +282,19 @@ fun BottomSheetContent(
                             selected = (text == selectedOption),
                             onClick = {
                                 onOptionSelected(text)
-                                if (title != context.getString(R.string.language)) {
-                                    if (text != selectedOption) {
-                                        viewModel.writeData(TEMP_UNIT, text)
-                                    }
+                                if (text != selectedOption) {
+                                    viewModel.saveInt(TEMP_UNIT, index)
                                 }
                                 scope.launch { sheetState.collapse() }
                             },
                             colors = RadioButtonDefaults.colors(
-                                unselectedColor = Secondary.copy(alpha = 0.3f)
+                                unselectedColor = MaterialTheme.colors.primaryVariant.copy(alpha = 0.3f)
                             )
                         )
                     }
 
                     // Don't draw line after last item in the list
-                    if (text != dataType.last()) {
+                    if (text != units.last()) {
                         Line(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -367,7 +322,10 @@ fun BottomSheetContent(
                     }, colors = ButtonDefaults.buttonColors(Color.Transparent),
                 elevation = null
             ) {
-                Text(text = stringResource(id = R.string.cancel), color = Color.White)
+                Text(
+                    text = stringResource(id = R.string.cancel),
+                    color = MaterialTheme.colors.primary
+                )
             }
         }
     }
@@ -379,14 +337,20 @@ fun CustomButton(
     modifier: Modifier,
     title: String,
     selected: String,
-    onButtonClicked: () -> Unit
+    onButtonClicked: () -> Unit,
+    viewModel: SettingsViewModel,
+    appTheme: MutableState<Boolean>
 ) {
+    val context = LocalContext.current
+
     Button(
         elevation = null,
         modifier = modifier,
-        colors = ButtonDefaults.buttonColors(backgroundColor = HomeBackground),
+        colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.background),
         onClick = {
-            onButtonClicked()
+            if (title != context.getString(R.string.dark_theme)) {
+                onButtonClicked()
+            }
         }) {
 
         Text(
@@ -394,15 +358,15 @@ fun CustomButton(
                 withStyle(style = ParagraphStyle(lineHeight = 18.sp)) {
                     withStyle(
                         style = SpanStyle(
-                            color = Secondary,
-                            fontSize = 18.sp
+                            color = MaterialTheme.colors.primaryVariant,
+                            fontSize = 17.sp
                         )
                     ) {
                         append("$title\n")
                     }
                     withStyle(
                         style = SpanStyle(
-                            color = Hint,
+                            color = MaterialTheme.colors.secondary,
                             fontSize = 12.sp
                         )
                     ) {
@@ -412,10 +376,34 @@ fun CustomButton(
             }, modifier = Modifier.weight(9f)
         )
 
-        Image(
-            modifier = Modifier.weight(1f),
-            painter = painterResource(id = R.drawable.ic_keyboard_arrow_right),
-            contentDescription = ""
-        )
+        if (title == stringResource(R.string.dark_theme)) {
+            val checkedState = remember { mutableStateOf(true) }
+
+            Switch(
+                modifier = Modifier.weight(1f),
+                checked = appTheme.value,
+                onCheckedChange = {
+                    checkedState.value = it
+                    onButtonClicked()
+                    viewModel.saveBoolean(DARK_THEME, appTheme.value)
+                },
+                colors = SwitchDefaults.colors(MaterialTheme.colors.secondary)
+            )
+        } else if (title == stringResource(R.string.city)) {
+            Image(
+                modifier = Modifier.weight(1f),
+                painter = painterResource(id = R.drawable.ic_keyboard_arrow_right),
+                contentDescription = ""
+            )
+        }
+    }
+}
+
+@Composable
+fun selected(index: Int): String {
+    return when (index) {
+        0 -> stringResource(R.string.celsius)
+        1 -> stringResource(R.string.fahrenheit)
+        else -> stringResource(R.string.celsius)
     }
 }

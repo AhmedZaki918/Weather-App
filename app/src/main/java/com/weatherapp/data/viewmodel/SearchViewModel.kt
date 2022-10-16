@@ -4,18 +4,16 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.weatherapp.data.local.Constants.DEFAULT_UNIT
-import com.weatherapp.data.local.Constants.FAHRENHEIT
 import com.weatherapp.data.local.Constants.IMPERIAL
 import com.weatherapp.data.local.Constants.METRIC
 import com.weatherapp.data.local.Constants.TEMP_UNIT
-import com.weatherapp.util.RequestState
 import com.weatherapp.data.model.forecast.FiveDaysForecastResponse
 import com.weatherapp.data.model.geocoding.GeocodingResponse
 import com.weatherapp.data.model.weather.CurrentWeatherResponse
 import com.weatherapp.data.network.Resource
 import com.weatherapp.data.repository.SearchRepo
 import com.weatherapp.util.DataStoreRepo
+import com.weatherapp.util.RequestState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -49,10 +47,10 @@ class SearchViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            dataStoreRepo.readState(TEMP_UNIT).collectLatest { unit ->
+            dataStoreRepo.readInt(TEMP_UNIT).collectLatest { unit ->
                 tempUnit = when (unit) {
-                    DEFAULT_UNIT -> METRIC
-                    FAHRENHEIT -> IMPERIAL
+                    0 -> METRIC
+                    1 -> IMPERIAL
                     else -> METRIC
                 }
             }

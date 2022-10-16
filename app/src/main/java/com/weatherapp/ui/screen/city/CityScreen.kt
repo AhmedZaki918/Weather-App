@@ -9,7 +9,6 @@ import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -60,7 +59,7 @@ fun Header(
     ConstraintLayout(
         modifier = Modifier
             .fillMaxSize()
-            .background(HomeBackground)
+            .background(MaterialTheme.colors.background)
     ) {
 
         val context = LocalContext.current
@@ -75,7 +74,7 @@ fun Header(
             },
             text = stringResource(R.string.city),
             fontSize = 25.sp,
-            color = Color.White
+            color = MaterialTheme.colors.primary
         )
 
         Text(
@@ -90,7 +89,7 @@ fun Header(
             fontSize = 16.sp,
             lineHeight = 25.sp,
             textAlign = TextAlign.Center,
-            color = Secondary
+            color = MaterialTheme.colors.primaryVariant
         )
 
         TextField(
@@ -99,7 +98,7 @@ fun Header(
                     top.linkTo(txtCaption.bottom, LARGE_MARGIN)
                     start.linkTo(parent.start, MEDIUM_MARGIN)
                 }
-                .background(BottomSheet),
+                .background(MaterialTheme.colors.surface),
             value = textFieldState,
             onValueChange = {
                 textFieldState = it
@@ -108,10 +107,10 @@ fun Header(
                 Text(
                     modifier = Modifier.alpha(ContentAlpha.medium),
                     text = stringResource(id = R.string.enter_city),
-                    color = Color.White
+                    color =  MaterialTheme.colors.primary
                 )
             },
-            textStyle = TextStyle(color = Secondary),
+            textStyle = TextStyle(color =  MaterialTheme.colors.primaryVariant),
             singleLine = true
         )
 
@@ -120,15 +119,15 @@ fun Header(
                 top.linkTo(tfCity.top, VERY_SMALL_MARGIN)
                 start.linkTo(tfCity.end, MEDIUM_MARGIN)
             },
-            colors = ButtonDefaults.buttonColors(backgroundColor = Hint),
+            colors = ButtonDefaults.buttonColors(backgroundColor =  MaterialTheme.colors.secondary),
             onClick = {
-                viewModel.saveCity(textFieldState)
+                viewModel.saveCityName(textFieldState)
                 context.toast("$textFieldState ${context.resources.getString(R.string.city_saved)}")
                 navController.navigateUp()
             }) {
             Text(
                 text = stringResource(id = R.string.add),
-                color = Color.Black, fontSize = 16.sp
+                color =  MaterialTheme.colors.onSecondary, fontSize = 16.sp
             )
         }
 
@@ -139,7 +138,7 @@ fun Header(
                     start.linkTo(icon.end, SMALL_MARGIN)
                 },
             text = stringResource(R.string.suggested),
-            color = Secondary
+            color =  MaterialTheme.colors.primaryVariant
         )
 
         Icon(
@@ -149,7 +148,7 @@ fun Header(
                     start.linkTo(parent.start, LARGE_MARGIN)
                 },
             painter = painterResource(id = R.drawable.ic_outline_location_city),
-            tint = Secondary,
+            tint =  MaterialTheme.colors.primaryVariant,
             contentDescription = ""
         )
 

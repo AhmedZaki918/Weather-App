@@ -18,14 +18,38 @@ class DataStoreRepo @Inject constructor(
 ) {
     private val dataStore = context.dataStore
 
-    suspend fun writeState(key: Preferences.Key<String>, value: String) {
+
+    suspend fun writeString(key: Preferences.Key<String>, value: String) {
         dataStore.edit {
             it[key] = value
         }
     }
 
-    fun readState(key: Preferences.Key<String>) =
+    suspend fun writeBoolean(key: Preferences.Key<Boolean>, value: Boolean) {
+        dataStore.edit {
+            it[key] = value
+        }
+    }
+
+    suspend fun writeInt(key: Preferences.Key<Int>, value: Int) {
+        dataStore.edit {
+            it[key] = value
+        }
+    }
+
+
+    fun readString(key: Preferences.Key<String>) =
         dataStore.data.map {
             it[key] ?: ""
+        }
+
+    fun readBoolean(key: Preferences.Key<Boolean>) =
+        dataStore.data.map {
+            it[key] ?: true
+        }
+
+    fun readInt(key: Preferences.Key<Int>) =
+        dataStore.data.map {
+            it[key] ?: 0
         }
 }

@@ -2,6 +2,7 @@ package com.weatherapp.navigation
 
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -29,7 +30,8 @@ fun NavGraph(
     homeViewModel: HomeViewModel,
     searchViewModel: SearchViewModel,
     settingsViewModel: SettingsViewModel,
-    cityViewModel: CityViewModel
+    cityViewModel: CityViewModel,
+    appTheme : MutableState<Boolean>
 ) {
 
     NavHost(
@@ -51,7 +53,8 @@ fun NavGraph(
         composable(route = BottomBarScreen.Settings.route) {
             SettingsScreen(
                 navController = navController,
-                viewModel = settingsViewModel
+                viewModel = settingsViewModel,
+                appTheme = appTheme
             )
         }
 

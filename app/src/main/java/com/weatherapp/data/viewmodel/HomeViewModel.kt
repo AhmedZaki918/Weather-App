@@ -4,10 +4,9 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.weatherapp.data.local.Constants.CITY_INDEX
 import com.weatherapp.data.local.Constants.CITY_NAME
 import com.weatherapp.data.local.Constants.DEFAULT_CITY
-import com.weatherapp.data.local.Constants.DEFAULT_UNIT
-import com.weatherapp.data.local.Constants.FAHRENHEIT
 import com.weatherapp.data.local.Constants.IMPERIAL
 import com.weatherapp.data.local.Constants.METRIC
 import com.weatherapp.data.local.Constants.TEMP_UNIT
@@ -23,6 +22,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import java.util.*
 import javax.inject.Inject
 
 @HiltViewModel
@@ -46,11 +46,13 @@ class HomeViewModel @Inject constructor(
         mutableStateOf(RequestState.IDLE)
 
     var tempUnit = ""
+//    var language = ""
 
     init {
+//        readLanguageApp()
         readTempUnit()
         viewModelScope.launch {
-            dataStoreRepo.readState(CITY_NAME).collectLatest {
+            dataStoreRepo.readString(CITY_NAME).collectLatest {
                 cityState.value = it.ifEmpty { DEFAULT_CITY }
                 initGeocoding(cityState.value)
             }
@@ -58,12 +60,17 @@ class HomeViewModel @Inject constructor(
     }
 
 
+//    private fun readLanguageApp(): String {
+//        Locale.getDefault().language
+//
+//    }
+
     private fun readTempUnit() {
         viewModelScope.launch {
-            dataStoreRepo.readState(TEMP_UNIT).collectLatest { unit ->
+            dataStoreRepo.readInt(TEMP_UNIT).collectLatest { unit ->
                 tempUnit = when (unit) {
-                    DEFAULT_UNIT -> METRIC
-                    FAHRENHEIT -> IMPERIAL
+                    0 -> METRIC
+                    1 -> IMPERIAL
                     else -> METRIC
                 }
             }

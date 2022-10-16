@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -18,10 +19,8 @@ import androidx.navigation.NavHostController
 import com.weatherapp.R
 import com.weatherapp.data.model.City
 import com.weatherapp.data.viewmodel.CityViewModel
-import com.weatherapp.ui.theme.HomeBackground
 import com.weatherapp.ui.theme.LARGE_MARGIN
 import com.weatherapp.ui.theme.MEDIUM_MARGIN
-import com.weatherapp.ui.theme.Secondary
 import com.weatherapp.util.Line
 import com.weatherapp.util.toast
 
@@ -37,13 +36,16 @@ fun ListItemCity(
     val context = LocalContext.current
     Surface(modifier = Modifier.fillMaxWidth(),
         onClick = {
-            viewModel.saveCity(city.name)
+            viewModel.apply {
+                saveCityIndex(city.index)
+                saveCityName(city.name)
+            }
             context.toast("${city.name} ${context.resources.getString(R.string.city_saved)}")
             navController.navigateUp()
         }) {
 
         ConstraintLayout(
-            modifier = Modifier.background(HomeBackground)
+            modifier = Modifier.background(MaterialTheme.colors.background)
         ) {
             val (txtCity, line, icon) = createRefs()
 
@@ -53,7 +55,7 @@ fun ListItemCity(
                     start.linkTo(parent.start, LARGE_MARGIN)
                 },
                 text = city.name,
-                color = Secondary,
+                color = MaterialTheme.colors.primaryVariant,
                 fontSize = 16.sp
             )
 

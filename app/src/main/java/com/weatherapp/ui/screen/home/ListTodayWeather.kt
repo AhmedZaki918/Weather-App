@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -13,10 +14,14 @@ import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import coil.annotation.ExperimentalCoilApi
 import coil.compose.rememberImagePainter
+import com.weatherapp.data.local.Constants
+import com.weatherapp.data.local.Constants.DEGREE
+import com.weatherapp.data.local.Constants.IMAGE_URL
+import com.weatherapp.data.local.Constants.SIZE
 import com.weatherapp.data.model.forecast.ListItem
-import com.weatherapp.ui.theme.ListContent
+import com.weatherapp.ui.theme.Gray
 import com.weatherapp.ui.theme.SMALL_MARGIN
-import com.weatherapp.ui.theme.Secondary
+import com.weatherapp.ui.theme.LightGray
 
 @ExperimentalCoilApi
 @Composable
@@ -28,7 +33,7 @@ fun ListTodayWeather(forecast: ListItem) {
         modifier = Modifier
             .padding(8.dp)
             .size(60.dp, 110.dp),
-        backgroundColor = ListContent
+        backgroundColor = MaterialTheme.colors.surface
     ) {
 
         ConstraintLayout {
@@ -37,9 +42,9 @@ fun ListTodayWeather(forecast: ListItem) {
 
             Image(
                 painter = rememberImagePainter(
-                    data = "http://openweathermap.org/img/wn/${
+                    data = "$IMAGE_URL${
                         forecast.weather?.get(0)?.icon
-                    }@2x.png"
+                    }$SIZE"
                 ),
                 contentDescription = "",
                 modifier = Modifier
@@ -51,8 +56,8 @@ fun ListTodayWeather(forecast: ListItem) {
             )
 
 
-            Text(text = forecast.main?.temp.toString().substring(0, lastIndex) + " °",
-                color = Secondary,
+            Text(text = forecast.main?.temp.toString().substring(0, lastIndex) + " " + DEGREE,
+                color = MaterialTheme.colors.primaryVariant,
                 fontSize = 16.sp,
                 modifier = Modifier
                     .constrainAs(txtTemp) {
@@ -63,7 +68,7 @@ fun ListTodayWeather(forecast: ListItem) {
             )
 
             Text(text = forecast.dt_txt?.substring(11, 16).toString(),
-                color = Secondary,
+                color = MaterialTheme.colors.primaryVariant,
                 fontSize = 16.sp,
                 modifier = Modifier
                     .constrainAs(txtTime) {
