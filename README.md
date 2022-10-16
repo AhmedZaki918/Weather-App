@@ -17,7 +17,7 @@ Jetpack Compose [The modern ui toolkit for building native ui on android].
 ## Screenshots
 
 <img src="images/1- Home.jpg" width="200" > <img src="images/2- Search.jpg" width="200">
-<img src="images/3- Search details.jpg" width="200">
+<img src="images/3- Search Details.jpg" width="200">
 <img src="images/4- Settings.jpg" width="200">
 <img src="images/5- Temp Unit.jpg" width="200">
 <img src="images/6- Add City.jpg" width="200">
