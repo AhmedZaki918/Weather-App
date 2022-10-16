@@ -34,3 +34,24 @@ Jetpack Compose [The modern ui toolkit for building native ui on android].
 - Support dark theme and light theme
 - Suppprt arabic and english language
 - Save any location you want via wishlist screen
+
+## Technologies
+
+#### Languages:
+- Kotlin 
+
+#### User interface structure:
+- Jetpack Compose
+
+#### Architecture patterns:
+- MVVM
+
+#### Libraries:
+- Retrofit            2.9.0 (https://square.github.io/retrofit/)
+- Gson                2.9.0 (https://github.com/google/gson)
+- Coil                1.3.0 (https://coil-kt.github.io/coil/)
+- DataStore           1.0.0 (https://developer.android.com/jetpack/androidx/releases/datastore)
+- Coroutine           1.6.4 (https://developer.android.com/kotlin/coroutines)
+- Hilt                2.42 (https://developer.android.com/training/dependency-injection/hilt-android)
+- Navigation          2.5.2 (https://developer.android.com/jetpack/compose/navigation)
+- ConstraintLayout    1.0.1 (https://developer.android.com/jetpack/androidx/releases/constraintlayout)
