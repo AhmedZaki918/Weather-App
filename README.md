@@ -27,3 +27,10 @@ Jetpack Compose [The modern ui toolkit for building native ui on android].
 <img src="images/10- Settings.jpg" width="250">
 <img src="images/11- Temp Unit.jpg" width="250">
 <img src="images/12- Add City.jpg" width="250">
+
+## Functionality
+- Search any location you want by city name or state code
+- Sugessted cities to know the current weather at this moment 
+- Support dark theme and light theme
+- Suppprt arabic and english language
+- Save any location you want via wishlist screen
