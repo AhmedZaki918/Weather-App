@@ -13,3 +13,7 @@
 
 Sample weather android app to get any location you want by city name or state code, implemented with lastest technology on android
 Jetpack Compose [The modern ui toolkit for building native ui on android].
+
+## Screenshots
+
+<img src="images/1- Home.jpg" width="200" > <img src="images/2- Search.jpg" width="200">
