@@ -6,7 +6,6 @@
 * [Functionality](#functionality)
 * [Technologies](#technologies)
 * [Setup](#setup)
-* [YouTube Link](#youtube-link)
 * [License](#license)
 
 ## General info
@@ -55,3 +54,40 @@ Jetpack Compose [The modern ui toolkit for building native ui on android].
 - Hilt                2.42 (https://developer.android.com/training/dependency-injection/hilt-android)
 - Navigation          2.5.2 (https://developer.android.com/jetpack/compose/navigation)
 - ConstraintLayout    1.0.1 (https://developer.android.com/jetpack/androidx/releases/constraintlayout)
+
+## Setup
+
+- To run this project, install it by download or clone.
+- Then regiser an account on this website https://openweathermap.org/api to acquire a new api key.
+- Enter this api key in Constants object under API_KEY field [path: data/local/Constants]
+
+
+#### System requirements
+- Android Studio Dolphin | 2021.3.1 Patch 1
+- Minimum sdk v21
+- Target sdk v32
+- Compile sdk v32
+
+## License
+
+```html
+MIT Licence 
+
+Copyright (c) 2022 Ahmed Zaki
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software
+and associated documentation files (the "Software"), to deal in the Software without restriction,
+including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
+and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, 
+subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial 
+portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, 
+INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE
+AND NONINFRINGEMENT.IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE
+OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+```
