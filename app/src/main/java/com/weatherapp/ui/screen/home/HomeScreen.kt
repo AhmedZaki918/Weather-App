@@ -8,10 +8,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.Icon
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -22,14 +19,17 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.navigation.NavHostController
 import coil.annotation.ExperimentalCoilApi
 import coil.compose.rememberImagePainter
 import com.weatherapp.R
 import com.weatherapp.data.local.Constants.C_UNIT
+import com.weatherapp.data.local.Constants.DETAILS_SCREEN
 import com.weatherapp.data.local.Constants.FORMAT_TYPE
 import com.weatherapp.data.local.Constants.F_UNIT
 import com.weatherapp.data.local.Constants.IMAGE_URL
@@ -49,7 +49,8 @@ import com.weatherapp.util.handleApiError
 
 @Composable
 fun HomeScreen(
-    viewModel: HomeViewModel
+    viewModel: HomeViewModel,
+    navController: NavHostController
 ) {
 
     val apiError = remember {
@@ -64,7 +65,8 @@ fun HomeScreen(
             RequestState.COMPLETE -> {
                 UpdateUi(
                     viewModel,
-                    apiError
+                    apiError,
+                    navController
                 )
             }
             RequestState.ERROR -> {
@@ -104,7 +106,8 @@ fun LoadingScreen() {
 @Composable
 fun UpdateUi(
     viewModel: HomeViewModel,
-    apiError: MutableState<String>
+    apiError: MutableState<String>,
+    navController: NavHostController
 ) {
 
     val context = LocalContext.current
@@ -124,7 +127,7 @@ fun UpdateUi(
         val (
             icLocation, txtLocation,
             icWind, txtWind, txtVisibility, icVisibility,
-            boxHumidityPercentage, txtHumidity, txtDate, lrWeather, coContainer
+            boxHumidityPercentage, txtHumidity, txtDate, lrWeather, coContainer, btnMore
         ) = createRefs()
 
 
@@ -210,7 +213,7 @@ fun UpdateUi(
                     }
                     .fillMaxWidth()
                     .padding(start = LARGE_MARGIN, end = LARGE_MARGIN)
-                    .clip( RoundedCornerShape(20.dp))
+                    .clip(RoundedCornerShape(20.dp))
                     .background(MaterialTheme.colors.onBackground),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
@@ -271,6 +274,31 @@ fun UpdateUi(
                         start.linkTo(icWind.end, SMALL_MARGIN)
                     }
             )
+
+            Button(
+                onClick = {
+                  navController.navigate(DETAILS_SCREEN)
+                },
+                elevation = null,
+                colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.background),
+                modifier = Modifier.constrainAs(btnMore) {
+                    top.linkTo(txtWind.top)
+                    bottom.linkTo(txtWind.bottom)
+                    end.linkTo(parent.end, SMALL_MARGIN)
+                }) {
+
+                Text(
+                    text = stringResource(R.string.more),
+                    textDecoration = TextDecoration.Underline,
+                    color = MaterialTheme.colors.primaryVariant,
+                )
+
+                Image(
+                    painter = painterResource(id = R.drawable.ic_keyboard_arrow_right),
+                    contentDescription = "",
+                    alpha = 0.7f
+                )
+            }
 
 
 

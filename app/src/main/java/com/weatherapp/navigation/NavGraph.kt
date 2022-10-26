@@ -10,6 +10,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.weatherapp.data.local.Constants.CITY_SCREEN
 import com.weatherapp.data.local.Constants.CONFIRM
+import com.weatherapp.data.local.Constants.DETAILS_SCREEN
 import com.weatherapp.data.local.Constants.ERROR_SCREEN
 import com.weatherapp.data.local.Constants.TEXT
 import com.weatherapp.data.local.Constants.TITLE
@@ -19,6 +20,7 @@ import com.weatherapp.data.viewmodel.SearchViewModel
 import com.weatherapp.data.viewmodel.SettingsViewModel
 import com.weatherapp.ui.screen.ErrorScreen
 import com.weatherapp.ui.screen.city.CityScreen
+import com.weatherapp.ui.screen.details.DetailsScreen
 import com.weatherapp.ui.screen.home.HomeScreen
 import com.weatherapp.ui.screen.search.SearchScreen
 import com.weatherapp.ui.screen.settings.SettingsScreen
@@ -31,7 +33,7 @@ fun NavGraph(
     searchViewModel: SearchViewModel,
     settingsViewModel: SettingsViewModel,
     cityViewModel: CityViewModel,
-    appTheme : MutableState<Boolean>
+    appTheme: MutableState<Boolean>
 ) {
 
     NavHost(
@@ -41,9 +43,15 @@ fun NavGraph(
 
         composable(route = BottomBarScreen.Home.route) {
             HomeScreen(
-                viewModel = homeViewModel
+                viewModel = homeViewModel,
+                navController = navController
             )
         }
+
+        composable(route = DETAILS_SCREEN) {
+            DetailsScreen()
+        }
+
         composable(route = BottomBarScreen.Search.route) {
             SearchScreen(
                 viewModel = searchViewModel,

@@ -6,7 +6,7 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 
 object Constants {
 
-    const val API_KEY = "REPLACE_YOUR_API_KEY"
+    const val API_KEY = "8659513ac2ead6fa172a8d5d75a4f972"
     const val BASE_URL = "http://api.openweathermap.org/"
 
     // Image urls
@@ -15,6 +15,7 @@ object Constants {
 
     const val DEFAULT_CITY = "Cairo"
     const val CITY_SCREEN = "city"
+    const val DETAILS_SCREEN = "details"
     const val FORMAT_TYPE = "dd.MM.yyyy"
     const val ERROR_SCREEN = "error"
 
@@ -42,4 +43,7 @@ object Constants {
     val CITY_NAME = stringPreferencesKey(name = "city_name")
     val TEMP_UNIT = intPreferencesKey(name = "temp_unit")
     val DARK_THEME = booleanPreferencesKey(name = "dark_theme")
+
+    const val EN = "en"
+    const val AR = "ar"
 }

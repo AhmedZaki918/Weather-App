@@ -47,4 +47,13 @@
     <string name="dark_theme">تفعيل الوضع الليلى</string>
     <string name="home">الرئيسية</string>
     <string name="wishlist">المفضلة</string>
+    <string name="more">تفاصيل</string>
+    <string name="current_air">جودة الهواء الحالى</string>
+    <string name="air_quailty_index_des">اعتبر أن ايه كيو اى كمعيار يبدأ من 1 !لى 5. على سبيل المثال، القيمة 1 تمثل جودة هواء جيدة، بينما القيمة فوق 4 تمثل جودة هواء خطرة للغاية.</string>
+    <string name="good">جيد</string>
+    <string name="fair">مقبول</string>
+    <string name="moderate">متوسط</string>
+    <string name="poor">سئ</string>
+    <string name="very_poor">خطير  جدا</string>
+    <string name="current_pollutants">الملوثات الحالية</string>
 </resources>

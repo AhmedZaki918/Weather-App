@@ -60,7 +60,26 @@
     <string name="dark_theme">Enable dark theme</string>
 
     <string name="wishlist">Wishlist</string>
+    <string name="more">More</string>
 
+    <!--  Details Screen  -->
+    <string name="current_air">Current Air Quality</string>
+    <string name="air_quailty_index_des"> Think of the AQI as a yardstick that runs from 1 to 5. For example, an AQI value of 1 represents good air quality, while an AQI value over 4 represents hazardous air quality.</string>
+    <string name="good">Good</string>
+    <string name="fair">Fair</string>
+    <string name="moderate">Moderate</string>
+    <string name="poor">Poor</string>
+    <string name="very_poor">Very Poor</string>
+    <string name="current_pollutants">Current Pollutants</string>
+    <string name="current_cloudiness">Current Cloudiness</string>
+    <string name="aqi">AQI</string>
+
+    <string name="ozone">Ozone, or trioxygen, is an inorganic molecule with the chemical formula O3. It is a pale blue gas with a distinctively pungent smell.</string>
+    <string name="particulates_matter2.5">Particulates also known as particulate matter (PM) are microscopic particles of solid or liquid matter suspended in the air.</string>
+    <string name="particulates_matter10">So called fine particulate matter (PM2.5), tends to penetrate into the gas exchange regions of the lung.</string>
+    <string name="nitrogen_dioxide">Nitrogen dioxide is a chemical compound with the formula NO2. It is one of several nitrogen oxides.</string>
+    <string name="cloudiness_volume">Cloudiness volume at this moment</string>
+    <string name="title_five_days">5 days forecast every 3 hours</string>
 
 
 </resources>

@@ -21,6 +21,8 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.weatherapp.R
+import com.weatherapp.data.local.Constants.AR
+import com.weatherapp.data.local.Constants.EN
 import com.weatherapp.data.network.Resource
 import java.text.SimpleDateFormat
 import java.time.LocalDateTime
@@ -35,7 +37,7 @@ fun Context.toast(message: String?) {
 
 fun getLocal(): String {
     val lang = Locale.getDefault().language
-    return if (lang != "en" && lang != "ar")  "en" else lang
+    return if (lang != EN && lang != AR)  EN else lang
 }
 
 @Composable

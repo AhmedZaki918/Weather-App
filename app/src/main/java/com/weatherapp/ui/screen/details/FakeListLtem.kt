@@ -1,4 +1,4 @@
-package com.weatherapp.ui.screen.search
+package com.weatherapp.ui.screen.details
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -8,17 +8,16 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
-import coil.compose.rememberImagePainter
-import com.weatherapp.data.local.Constants.DEGREE
-import com.weatherapp.data.local.Constants.IMAGE_URL
-import com.weatherapp.data.local.Constants.SIZE
-import com.weatherapp.data.model.forecast.ListItem
+import com.weatherapp.R
+import com.weatherapp.data.local.Constants
+import com.weatherapp.data.model.FakeData
 import com.weatherapp.ui.theme.CUSTOM_MARGIN
 import com.weatherapp.ui.theme.LARGE_MARGIN
 import com.weatherapp.ui.theme.SMALL_MARGIN
@@ -26,12 +25,10 @@ import com.weatherapp.util.Line
 
 
 @Composable
-fun ListWeatherForecast(forecast: ListItem) {
-
+fun FakeListItem(data: FakeData) {
 
     ConstraintLayout(modifier = Modifier.fillMaxWidth()) {
         val (txtDateTime, imageWeather, txtWeather, txtTemp, line) = createRefs()
-        val lastIndex = forecast.main?.temp.toString().indexOf(".")
 
 
         Text(
@@ -42,7 +39,7 @@ fun ListWeatherForecast(forecast: ListItem) {
                         fontSize = 14.sp
                     )
                 ) {
-                    append("${forecast.dt_txt?.substring(0, 10)}\n")
+                    append("${data.date}\n")
                 }
                 withStyle(
                     style = SpanStyle(
@@ -50,7 +47,7 @@ fun ListWeatherForecast(forecast: ListItem) {
                         fontSize = 16.sp
                     )
                 ) {
-                    append(forecast.dt_txt?.substring(11, 16).toString())
+                    append(data.time.toString())
                 }
             },
             modifier = Modifier
@@ -60,20 +57,21 @@ fun ListWeatherForecast(forecast: ListItem) {
                 }
         )
 
-        Image(painter = rememberImagePainter(
-            data = "$IMAGE_URL${forecast.weather?.get(0)?.icon}$SIZE"
-        ),
+        Image(painter = painterResource(id = R.drawable.preview_all_cloud),
             contentDescription = "",
             modifier = Modifier
                 .constrainAs(imageWeather) {
                     start.linkTo(txtDateTime.end, LARGE_MARGIN)
                     top.linkTo(txtDateTime.top)
                     bottom.linkTo(txtDateTime.bottom)
-                }.size(50.dp)
+                }
+                .size(50.dp)
         )
 
+
+
         Text(
-            text = forecast.weather?.get(0)?.description.toString(),
+            text = data.des.toString(),
             fontSize = 14.sp,
             color = MaterialTheme.colors.primaryVariant,
             modifier = Modifier
@@ -86,7 +84,7 @@ fun ListWeatherForecast(forecast: ListItem) {
 
 
         Text(
-            text = forecast.main?.temp.toString().substring(0, lastIndex) + DEGREE,
+            text = data.temp + Constants.DEGREE,
             fontSize = 20.sp,
             color = MaterialTheme.colors.primaryVariant,
             modifier = Modifier
@@ -107,4 +105,3 @@ fun ListWeatherForecast(forecast: ListItem) {
         )
     }
 }
-

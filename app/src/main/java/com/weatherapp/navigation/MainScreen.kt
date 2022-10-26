@@ -15,6 +15,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.weatherapp.R
 import com.weatherapp.data.local.Constants.CITY_SCREEN
+import com.weatherapp.data.local.Constants.DETAILS_SCREEN
 import com.weatherapp.data.local.Constants.ERROR_SCREEN
 import com.weatherapp.data.local.Constants.HOME
 import com.weatherapp.data.local.Constants.SEARCH
@@ -68,6 +69,7 @@ fun BottomBar(navController: NavHostController) {
         BottomBarScreen.Settings.route -> bottomBarState = true
         ERROR_SCREEN -> bottomBarState = false
         CITY_SCREEN -> bottomBarState = false
+        DETAILS_SCREEN -> bottomBarState = false
     }
 
 

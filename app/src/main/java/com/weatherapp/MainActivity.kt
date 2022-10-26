@@ -1,8 +1,6 @@
 package com.weatherapp
 
-import android.content.ContentValues.TAG
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -21,7 +19,6 @@ import com.weatherapp.navigation.MainScreen
 import com.weatherapp.ui.theme.WeatherAppTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
-import java.util.*
 
 @ExperimentalMaterialApi
 @AndroidEntryPoint
@@ -35,6 +32,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
+            // Read user app theme from DataStore
             val appTheme = remember { mutableStateOf(true) }
             LaunchedEffect(key1 = true) {
                 settingsViewModel.retrieveBoolean(DARK_THEME).collectLatest {
