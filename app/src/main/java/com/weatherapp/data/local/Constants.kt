@@ -6,7 +6,7 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 
 object Constants {
 
-    const val API_KEY = "8659513ac2ead6fa172a8d5d75a4f972"
+    const val API_KEY = "REPLACE_YOUR_API_KEY"
     const val BASE_URL = "http://api.openweathermap.org/"
 
     // Image urls
