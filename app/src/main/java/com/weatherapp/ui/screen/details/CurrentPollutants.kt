@@ -4,29 +4,41 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import com.weatherapp.R
-import com.weatherapp.ui.theme.*
-import com.weatherapp.util.Circle
+import com.weatherapp.data.local.Constants.UG_M3
+import com.weatherapp.data.model.pollution.AirPollutionResponse
+import com.weatherapp.data.viewmodel.DetailsViewModel
+import com.weatherapp.ui.theme.LARGE_MARGIN
+import com.weatherapp.ui.theme.MEDIUM_MARGIN
+import com.weatherapp.ui.theme.SMALL_MARGIN
 import com.weatherapp.util.Line
 
 
 @Composable
-fun CurrentPollutants(modifier: Modifier) {
+fun CurrentPollutants(
+    modifier: Modifier,
+    viewModel: DetailsViewModel,
+    airPollution: AirPollutionResponse?
+) {
 
     ConstraintLayout(modifier = modifier) {
-        val (txtHeader, dividerHeader, firstRow, secondRow, circleCloudiness,
-            txtCloudinessTitle, dividerCloudiness, iconCloud) = createRefs()
+        val (txtHeader, dividerHeader, firstRow, secondRow) = createRefs()
+
+        val components = airPollution?.list?.get(0)?.components
+        val no2 = viewModel.getNo2Details(components?.no2)
+        val pm25 = viewModel.getPm25Details(components?.pm2_5)
+        val pm10 = viewModel.getPm10Details(components?.pm10)
+        val ozone = viewModel.getOzoneDetails(components?.o3)
+
 
         // Header
         Text(
@@ -39,8 +51,6 @@ fun CurrentPollutants(modifier: Modifier) {
             color = MaterialTheme.colors.primary
         )
 
-
-        // Line
         Line(modifier = Modifier
             .constrainAs(dividerHeader) {
                 top.linkTo(txtHeader.bottom, SMALL_MARGIN)
@@ -61,18 +71,18 @@ fun CurrentPollutants(modifier: Modifier) {
             //Ozone
             Pollutant(
                 title = "O3",
-                color = AQI_Green,
-                status = "Good",
-                ug_m3 = "46 ug/m3",
+                status = ozone.status,
+                color = ozone.color,
+                ug_m3 = "${components?.o3} $UG_M3",
                 description = stringResource(R.string.ozone),
                 modifier = Modifier.padding(top = MEDIUM_MARGIN, end = SMALL_MARGIN)
             )
             // ParticulatesMatter_25
             Pollutant(
                 title = "PM 25",
-                color = AQI_Yellow,
-                status = "Fair",
-                ug_m3 = "33 ug/m3",
+                status = pm25.status,
+                color = pm25.color,
+                ug_m3 = "${components?.pm2_5} $UG_M3",
                 description = stringResource(R.string.particulates_matter2_5),
                 modifier = Modifier.padding(top = MEDIUM_MARGIN)
             )
@@ -89,9 +99,9 @@ fun CurrentPollutants(modifier: Modifier) {
             // ParticulatesMatter_10
             Pollutant(
                 title = "PM 10",
-                color = AQI_Yellow,
-                status = "Fair",
-                ug_m3 = "26 ug/m3",
+                status = pm10.status,
+                color = pm10.color,
+                ug_m3 = "${components?.pm10} $UG_M3",
                 description = stringResource(R.string.particulates_matter10),
                 modifier = Modifier.padding(top = MEDIUM_MARGIN, end = SMALL_MARGIN)
             )
@@ -99,57 +109,13 @@ fun CurrentPollutants(modifier: Modifier) {
             // NitrogenDioxide
             Pollutant(
                 title = "NO2",
-                color = AQI_Yellow,
-                status = "Fair",
-                ug_m3 = "5 ug/m3",
+                status = no2.status,
+                color = no2.color,
+                ug_m3 = "${components?.no2} $UG_M3",
                 description = stringResource(R.string.nitrogen_dioxide),
                 modifier = Modifier.padding(top = MEDIUM_MARGIN)
             )
         }
-
-        // Current cloudiness title
-        Text(
-            modifier = Modifier.constrainAs(txtCloudinessTitle) {
-                top.linkTo(secondRow.bottom, BIG_MARGIN)
-                start.linkTo(parent.start, LARGE_MARGIN)
-            },
-            text = stringResource(R.string.current_cloudiness),
-            fontSize = 18.sp,
-            color = MaterialTheme.colors.primary
-        )
-
-        Icon(
-            modifier = Modifier.constrainAs(iconCloud) {
-                top.linkTo(txtCloudinessTitle.top)
-                bottom.linkTo(txtCloudinessTitle.bottom)
-                start.linkTo(txtCloudinessTitle.end, SMALL_MARGIN)
-            }, painter = painterResource(id = R.drawable.preview_all_cloud),
-            contentDescription = "",
-            tint = MaterialTheme.colors.primary
-        )
-
-        // Line
-        Line(modifier = Modifier
-            .constrainAs(dividerCloudiness) {
-                top.linkTo(txtCloudinessTitle.bottom, SMALL_MARGIN)
-                start.linkTo(parent.start)
-                end.linkTo(parent.end)
-            }
-            .padding(start = LARGE_MARGIN, end = LARGE_MARGIN), thickness = 1.dp
-        )
-
-
-        // Cloudiness in percent
-        Circle(
-            modifier = Modifier.constrainAs(circleCloudiness) {
-                top.linkTo(dividerCloudiness.bottom, LARGE_MARGIN)
-                bottom.linkTo(parent.bottom, MEDIUM_MARGIN)
-                start.linkTo(parent.start)
-                end.linkTo(parent.end)
-            },
-            percentage = 0.6f,
-            arcColor = MaterialTheme.colors.secondary
-        )
     }
 }
 
@@ -157,8 +123,8 @@ fun CurrentPollutants(modifier: Modifier) {
 @Composable
 fun Pollutant(
     title: String,
-    color: Color,
     status: String,
+    color: Color,
     ug_m3: String,
     description: String,
     modifier: Modifier

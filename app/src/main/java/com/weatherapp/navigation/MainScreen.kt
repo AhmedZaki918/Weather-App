@@ -14,16 +14,16 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.weatherapp.R
+import com.weatherapp.data.local.Constants
 import com.weatherapp.data.local.Constants.CITY_SCREEN
 import com.weatherapp.data.local.Constants.DETAILS_SCREEN
 import com.weatherapp.data.local.Constants.ERROR_SCREEN
 import com.weatherapp.data.local.Constants.HOME
+import com.weatherapp.data.local.Constants.LATITUDE
+import com.weatherapp.data.local.Constants.LONGITUDE
 import com.weatherapp.data.local.Constants.SEARCH
 import com.weatherapp.data.local.Constants.WISHLIST
-import com.weatherapp.data.viewmodel.CityViewModel
-import com.weatherapp.data.viewmodel.HomeViewModel
-import com.weatherapp.data.viewmodel.SearchViewModel
-import com.weatherapp.data.viewmodel.SettingsViewModel
+import com.weatherapp.data.viewmodel.*
 
 
 @ExperimentalMaterialApi
@@ -33,6 +33,7 @@ fun MainScreen(
     searchViewModel: SearchViewModel,
     settingsViewModel: SettingsViewModel,
     cityViewModel: CityViewModel,
+    detailsViewModel: DetailsViewModel,
     appTheme: MutableState<Boolean>
 ) {
 
@@ -46,6 +47,7 @@ fun MainScreen(
             searchViewModel = searchViewModel,
             settingsViewModel = settingsViewModel,
             cityViewModel = cityViewModel,
+            detailsViewModel = detailsViewModel,
             appTheme = appTheme
         )
     }
@@ -67,9 +69,11 @@ fun BottomBar(navController: NavHostController) {
         BottomBarScreen.Home.route -> bottomBarState = true
         BottomBarScreen.Search.route -> bottomBarState = true
         BottomBarScreen.Settings.route -> bottomBarState = true
-        ERROR_SCREEN -> bottomBarState = false
+        "$ERROR_SCREEN/{${Constants.TITLE}}/{${Constants.TEXT}}/{${Constants.CONFIRM}}" -> {
+            bottomBarState = false
+        }
         CITY_SCREEN -> bottomBarState = false
-        DETAILS_SCREEN -> bottomBarState = false
+        "$DETAILS_SCREEN/{$LONGITUDE}/{$LATITUDE}/{${Constants.CLOUDINESS}}" -> bottomBarState = false
     }
 
 

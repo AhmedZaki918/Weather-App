@@ -11,10 +11,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.tooling.preview.Preview
 import com.weatherapp.data.local.Constants.DARK_THEME
-import com.weatherapp.data.viewmodel.CityViewModel
-import com.weatherapp.data.viewmodel.HomeViewModel
-import com.weatherapp.data.viewmodel.SearchViewModel
-import com.weatherapp.data.viewmodel.SettingsViewModel
+import com.weatherapp.data.viewmodel.*
 import com.weatherapp.navigation.MainScreen
 import com.weatherapp.ui.theme.WeatherAppTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -28,6 +25,7 @@ class MainActivity : ComponentActivity() {
     private val searchViewModel: SearchViewModel by viewModels()
     private val settingsViewModel: SettingsViewModel by viewModels()
     private val cityViewModel: CityViewModel by viewModels()
+    private val detailsViewModel: DetailsViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,6 +44,7 @@ class MainActivity : ComponentActivity() {
                     searchViewModel = searchViewModel,
                     settingsViewModel= settingsViewModel,
                     cityViewModel = cityViewModel,
+                    detailsViewModel = detailsViewModel,
                     appTheme = appTheme
                 )
             }

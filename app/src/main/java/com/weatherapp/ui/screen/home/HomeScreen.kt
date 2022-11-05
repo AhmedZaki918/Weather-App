@@ -1,5 +1,7 @@
 package com.weatherapp.ui.screen.home
 
+import android.content.ContentValues.TAG
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -115,6 +117,8 @@ fun UpdateUi(
     var data: CurrentWeatherResponse? = null
     var forecast: List<ListItem> = listOf()
     var windSpeed: Int? = null
+    var latitude = 0.0
+    var longitude = 0.0
 
     ConstraintLayout(
         modifier = Modifier
@@ -130,18 +134,22 @@ fun UpdateUi(
             boxHumidityPercentage, txtHumidity, txtDate, lrWeather, coContainer, btnMore
         ) = createRefs()
 
-
         val geocodingResponse by viewModel.geocoding.collectAsState()
+        val weatherResponse by viewModel.currentWeather.collectAsState()
+        val forecastResponse by viewModel.weatherForecast.collectAsState()
+
+
         if (geocodingResponse is Resource.Success) {
             val response = geocodingResponse as Resource.Success<List<GeocodingResponse>>
             response.value.also { geocoding ->
                 if (geocoding.isNotEmpty()) {
-                    val lat = geocoding[0].lat ?: 0.0
-                    val lon = geocoding[0].lon ?: 0.0
+                    latitude = geocoding[0].lat ?: 0.0
+                    longitude = geocoding[0].lon ?: 0.0
                     viewModel.apply {
-                        initCurrentWeather(lat, lon, tempUnit)
-                        initFiveDaysForecast(lat, lon, tempUnit)
+                        initCurrentWeather(latitude, longitude, tempUnit)
+                        initFiveDaysForecast(latitude, longitude, tempUnit)
                     }
+
                 } else {
                     apiError.value = context.getString(R.string.invalid_city)
                     viewModel.requestState.value = RequestState.ERROR
@@ -154,22 +162,20 @@ fun UpdateUi(
         }
 
 
-        val weatherResponse by viewModel.currentWeather.collectAsState()
         if (weatherResponse is Resource.Success) {
             data = (weatherResponse as Resource.Success<CurrentWeatherResponse>).value
             windSpeed = data?.wind?.speed?.times(60)?.times(60)?.div(1000)?.toInt()
-
         } else if (weatherResponse is Resource.Failure) {
             context.handleApiError(weatherResponse as Resource.Failure)
         }
 
 
-        val forecastResponse by viewModel.weatherForecast.collectAsState()
         if (forecastResponse is Resource.Success) {
             forecast = (forecastResponse as Resource.Success<FiveDaysForecastResponse>).value.list!!
-
         } else if (forecastResponse is Resource.Failure) {
-            context.handleApiError(forecastResponse as Resource.Failure)
+            LaunchedEffect(key1 = true){
+                context.handleApiError(forecastResponse as Resource.Failure)
+            }
         }
 
 
@@ -275,9 +281,12 @@ fun UpdateUi(
                     }
             )
 
+
             Button(
                 onClick = {
-                  navController.navigate(DETAILS_SCREEN)
+                    navController.navigate(
+                        "$DETAILS_SCREEN/${longitude.toFloat()}/${latitude.toFloat()}/${data?.clouds?.all}"
+                    )
                 },
                 elevation = null,
                 colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.background),

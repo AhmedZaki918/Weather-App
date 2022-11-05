@@ -25,7 +25,8 @@ class CityRepo @Inject constructor(
                 City(9,getString(R.string.saint_petersburg)),
                 City(10,getString(R.string.rome)),
                 City(11,getString(R.string.kuwait)),
-                City(12,getString(R.string.bilbeis))
+                City(12,getString(R.string.bilbeis)),
+                City(13,getString(R.string.pakistan))
             )
         }
     }

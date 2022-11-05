@@ -46,4 +46,10 @@ object Constants {
 
     const val EN = "en"
     const val AR = "ar"
+
+    const val LONGITUDE = "longitude"
+    const val LATITUDE = "latitude"
+    const val CLOUDINESS = "cloudiness percent"
+
+    const val UG_M3 = "ug/m3"
 }

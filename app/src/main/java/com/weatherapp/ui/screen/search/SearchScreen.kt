@@ -402,11 +402,11 @@ fun DisplayInvalidSearch(
     viewModel: SearchViewModel
 ) {
     navController.navigate(
-        "$ERROR_SCREEN/${stringResource(id = R.string.error)}/${
+        "$ERROR_SCREEN/${stringResource(id = R.string.error)}/${stringResource(id = R.string.invalid_city)}/${
             stringResource(
-                id = R.string.invalid_city
+                id = R.string.ok
             )
-        }/${stringResource(id = R.string.ok)}"
+        }"
     )
     viewModel.requestState.value = RequestState.IDLE
 }

@@ -10,6 +10,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
@@ -18,82 +20,163 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import com.weatherapp.R
-import com.weatherapp.data.local.Constants
-import com.weatherapp.data.repository.DetailsRepo
-import com.weatherapp.ui.theme.*
-import com.weatherapp.util.Line
-import com.weatherapp.util.formatDate
+import com.weatherapp.data.model.AirQuality
+import com.weatherapp.data.model.forecast.FiveDaysForecastResponse
+import com.weatherapp.data.model.forecast.ListItem
+import com.weatherapp.data.model.pollution.AirPollutionResponse
+import com.weatherapp.data.network.Resource
+import com.weatherapp.data.viewmodel.DetailsViewModel
+import com.weatherapp.ui.screen.search.ListWeatherForecast
+import com.weatherapp.ui.theme.BIG_MARGIN
+import com.weatherapp.ui.theme.LARGE_MARGIN
+import com.weatherapp.ui.theme.MEDIUM_MARGIN
+import com.weatherapp.ui.theme.SMALL_MARGIN
+import com.weatherapp.util.*
 
 @Composable
-fun DetailsScreen() {
+fun DetailsScreen(
+    viewModel: DetailsViewModel,
+    longitude: Float?,
+    latitude: Float?,
+    cloudiness: Int?
+) {
 
-    val fakeData = DetailsRepo().getData()
+    val apiError = remember {
+        mutableStateOf("")
+    }
 
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colors.background)
-            .padding(bottom = BIG_MARGIN)
-    ) {
-        item {
-            Header()
+    viewModel.requestState.value.also { state ->
+        when (state) {
+            RequestState.IDLE -> {
+                LoadingScreen()
+            }
+            RequestState.COMPLETE -> {
+                UpdateUi(viewModel, apiError, cloudiness)
+            }
+            RequestState.ERROR -> {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(MaterialTheme.colors.background)
+                        .padding(start = LARGE_MARGIN, end = LARGE_MARGIN),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = apiError.value,
+                        color = MaterialTheme.colors.primaryVariant,
+                        fontSize = 20.sp
+                    )
+                }
+            }
         }
-        items(fakeData) {
-            FakeListItem(data = it)
+    }
+
+    if (latitude != null && longitude != null) {
+        LaunchedEffect(key1 = true) {
+            viewModel.initGetAirPollution(
+                latitude.toDouble(),
+                longitude.toDouble()
+            )
+        }
+
+        LaunchedEffect(key1 = true) {
+            viewModel.initFiveDaysForecast(
+                latitude.toDouble(),
+                longitude.toDouble(),
+                viewModel.readTempUnit()
+            )
         }
     }
 }
 
 
 @Composable
-fun Header() {
+fun LoadingScreen() {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colors.background),
+        contentAlignment = Alignment.Center
+    ) {
+        CircularProgressIndicator()
+    }
+}
+
+
+@Composable
+fun UpdateUi(
+    viewModel: DetailsViewModel,
+    apiError: MutableState<String>,
+    cloudiness: Int?
+) {
+    val context = LocalContext.current
+    var fiveDaysForecast: List<ListItem> = listOf()
+    val forecastResponse by viewModel.weatherForecast.collectAsState()
+
+    if (forecastResponse is Resource.Success) {
+        fiveDaysForecast = (forecastResponse as Resource.Success<FiveDaysForecastResponse>).value.list!!
+    } else if (forecastResponse is Resource.Failure) {
+        LaunchedEffect(key1 = true){
+            context.handleApiError(forecastResponse as Resource.Failure)
+        }
+    }
+
+    LazyColumn(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colors.background)
+            .padding(bottom = SMALL_MARGIN)
+    ) {
+        item {
+            Header(viewModel, apiError, cloudiness)
+        }
+        items(fiveDaysForecast) {
+            ListWeatherForecast(forecast = it)
+        }
+    }
+}
+
+
+@Composable
+fun Header(
+    viewModel: DetailsViewModel,
+    apiError: MutableState<String>,
+    cloudiness: Int?
+) {
     ConstraintLayout {
 
         val (txtTitle, divider, txtToday, circleAQI, txtDescriptionAQI,
-            txtMoreDes, txtTitlePollutants, txtTitleFiveDays, secondDivider) = createRefs()
+            txtMoreDes, txtTitlePollutants, txtTitleFiveDays, secondDivider, circleCloudiness,
+            txtCloudinessTitle, dividerCloudiness, iconCloud) = createRefs()
 
-        val aqi = 2
-        val percentageAirQuality: Float
-        val colorAirQuality: Color
-        val desAirQuality: String
+        val context = LocalContext.current
+        var airPollution: AirPollutionResponse? = null
+        var airQuality: AirQuality? = null
+        val pollutionResponse by viewModel.currentPollution.collectAsState()
 
 
-        when (aqi) {
-            1 -> {
-                percentageAirQuality = 0.2f
-                colorAirQuality = AQI_Green
-                desAirQuality = stringResource(R.string.good)
+        if (pollutionResponse is Resource.Success) {
+            airPollution = (pollutionResponse as Resource.Success<AirPollutionResponse>).value
+            val aqi = airPollution.list?.get(0)?.main?.aqi
+            if (aqi != null) {
+                airQuality = viewModel.getAirQuality(aqi)
             }
-            2 -> {
-                percentageAirQuality = 0.4f
-                colorAirQuality = AQI_Yellow
-                desAirQuality = stringResource(R.string.fair)
-            }
-            3 -> {
-                percentageAirQuality = 0.6f
-                colorAirQuality = AQI_Orange
-                desAirQuality = stringResource(R.string.moderate)
-            }
-            4 -> {
-                percentageAirQuality = 0.8f
-                colorAirQuality = AQI_Red
-                desAirQuality = stringResource(R.string.poor)
-            }
-            else -> {
-                percentageAirQuality = 1f
-                colorAirQuality = AQI_RedDark
-                desAirQuality = stringResource(R.string.very_poor)
-            }
+
+        } else if (pollutionResponse is Resource.Failure) {
+            context.handleApiError(pollutionResponse as Resource.Failure)
+            apiError.value = context.getString(R.string.connection_error)
+            viewModel.requestState.value = RequestState.ERROR
         }
 
 
@@ -132,7 +215,7 @@ fun Header() {
                         fontSize = 14.sp
                     )
                 ) {
-                    append(formatDate(Constants.FORMAT_TYPE))
+                    append(convertUnixDate(airPollution?.list?.get(0)?.dt ?: 0))
                 }
             },
             modifier = Modifier
@@ -142,26 +225,29 @@ fun Header() {
                 }
         )
 
-        CircleCustom(
-            modifier = Modifier.constrainAs(circleAQI) {
-                top.linkTo(txtToday.bottom, MEDIUM_MARGIN)
-                start.linkTo(parent.start)
-                end.linkTo(parent.end)
-            },
-            percentage = percentageAirQuality,
-            colorAirQuality = colorAirQuality
-        )
+        if (airQuality != null) {
+            CircleCustom(
+                modifier = Modifier.constrainAs(circleAQI) {
+                    top.linkTo(txtToday.bottom, MEDIUM_MARGIN)
+                    start.linkTo(parent.start)
+                    end.linkTo(parent.end)
+                },
+                percentage = airQuality.percentage,
+                colorAirQuality = airQuality.color
+            )
+
+            Text(
+                modifier = Modifier.constrainAs(txtDescriptionAQI) {
+                    top.linkTo(circleAQI.bottom, MEDIUM_MARGIN)
+                    start.linkTo(parent.start)
+                    end.linkTo(parent.end)
+                }, text = airQuality.description,
+                color = MaterialTheme.colors.primary,
+                fontSize = 18.sp
+            )
+        }
 
 
-        Text(
-            modifier = Modifier.constrainAs(txtDescriptionAQI) {
-                top.linkTo(circleAQI.bottom, MEDIUM_MARGIN)
-                start.linkTo(parent.start)
-                end.linkTo(parent.end)
-            }, text = desAirQuality,
-            color = MaterialTheme.colors.primary,
-            fontSize = 18.sp
-        )
 
         Text(
             text = stringResource(R.string.air_quailty_index_des),
@@ -177,16 +263,64 @@ fun Header() {
             fontSize = 14.sp
         )
 
-        CurrentPollutants(modifier = Modifier.constrainAs(txtTitlePollutants) {
-            top.linkTo(txtMoreDes.bottom, BIG_MARGIN)
-            start.linkTo(parent.start)
-            end.linkTo(parent.end)
-        })
+        CurrentPollutants(
+            modifier = Modifier.constrainAs(txtTitlePollutants) {
+                top.linkTo(txtMoreDes.bottom, BIG_MARGIN)
+                start.linkTo(parent.start)
+                end.linkTo(parent.end)
+            }, viewModel,
+            airPollution
+        )
 
 
+        // Current cloudiness title
+        Text(
+            modifier = Modifier.constrainAs(txtCloudinessTitle) {
+                top.linkTo(txtTitlePollutants.bottom, BIG_MARGIN)
+                start.linkTo(parent.start, LARGE_MARGIN)
+            },
+            text = stringResource(R.string.current_cloudiness),
+            fontSize = 18.sp,
+            color = MaterialTheme.colors.primary
+        )
+
+        Icon(
+            modifier = Modifier.constrainAs(iconCloud) {
+                top.linkTo(txtCloudinessTitle.top)
+                bottom.linkTo(txtCloudinessTitle.bottom)
+                start.linkTo(txtCloudinessTitle.end, SMALL_MARGIN)
+            }, painter = painterResource(id = R.drawable.preview_all_cloud),
+            contentDescription = "",
+            tint = MaterialTheme.colors.primary
+        )
+
+        // Line
+        Line(modifier = Modifier
+            .constrainAs(dividerCloudiness) {
+                top.linkTo(txtCloudinessTitle.bottom, SMALL_MARGIN)
+                start.linkTo(parent.start)
+                end.linkTo(parent.end)
+            }
+            .padding(start = LARGE_MARGIN, end = LARGE_MARGIN), thickness = 1.dp
+        )
+
+
+        // Cloudiness in percent
+        Circle(
+            modifier = Modifier.constrainAs(circleCloudiness) {
+                top.linkTo(dividerCloudiness.bottom, LARGE_MARGIN)
+                start.linkTo(parent.start)
+                end.linkTo(parent.end)
+            },
+            percentage = cloudiness?.toDouble()?.div(100)?.toFloat() ?: 0f,
+            arcColor = MaterialTheme.colors.secondary
+        )
+
+
+        // Current 3 days forecast
         Text(
             modifier = Modifier.constrainAs(txtTitleFiveDays) {
-                top.linkTo(txtTitlePollutants.bottom, BIG_MARGIN)
+                top.linkTo(circleCloudiness.bottom, BIG_MARGIN)
                 start.linkTo(parent.start, LARGE_MARGIN)
             },
             text = stringResource(R.string.title_five_days),
@@ -267,11 +401,4 @@ fun CircleCustom(
             }
         )
     }
-}
-
-
-@Preview
-@Composable
-fun DetailsScreenPreview() {
-    DetailsScreen()
 }

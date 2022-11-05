@@ -9,15 +9,15 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.weatherapp.data.local.Constants.CITY_SCREEN
+import com.weatherapp.data.local.Constants.CLOUDINESS
 import com.weatherapp.data.local.Constants.CONFIRM
 import com.weatherapp.data.local.Constants.DETAILS_SCREEN
 import com.weatherapp.data.local.Constants.ERROR_SCREEN
+import com.weatherapp.data.local.Constants.LATITUDE
+import com.weatherapp.data.local.Constants.LONGITUDE
 import com.weatherapp.data.local.Constants.TEXT
 import com.weatherapp.data.local.Constants.TITLE
-import com.weatherapp.data.viewmodel.CityViewModel
-import com.weatherapp.data.viewmodel.HomeViewModel
-import com.weatherapp.data.viewmodel.SearchViewModel
-import com.weatherapp.data.viewmodel.SettingsViewModel
+import com.weatherapp.data.viewmodel.*
 import com.weatherapp.ui.screen.ErrorScreen
 import com.weatherapp.ui.screen.city.CityScreen
 import com.weatherapp.ui.screen.details.DetailsScreen
@@ -33,7 +33,8 @@ fun NavGraph(
     searchViewModel: SearchViewModel,
     settingsViewModel: SettingsViewModel,
     cityViewModel: CityViewModel,
-    appTheme: MutableState<Boolean>
+    detailsViewModel: DetailsViewModel,
+    appTheme: MutableState<Boolean>,
 ) {
 
     NavHost(
@@ -48,8 +49,25 @@ fun NavGraph(
             )
         }
 
-        composable(route = DETAILS_SCREEN) {
-            DetailsScreen()
+
+        composable(route = "$DETAILS_SCREEN/{$LONGITUDE}/{$LATITUDE}/{$CLOUDINESS}",
+            arguments = listOf(
+                navArgument(name = LONGITUDE) {
+                    type = NavType.FloatType
+                },
+                navArgument(name = LATITUDE) {
+                    type = NavType.FloatType
+                },
+                navArgument(name = CLOUDINESS) {
+                    type = NavType.IntType
+                }
+            )) {
+            DetailsScreen(
+                viewModel = detailsViewModel,
+                longitude = it.arguments?.getFloat(LONGITUDE),
+                latitude = it.arguments?.getFloat(LATITUDE),
+                cloudiness = it.arguments?.getInt(CLOUDINESS)
+            )
         }
 
         composable(route = BottomBarScreen.Search.route) {

@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.sp
 import com.weatherapp.R
 import com.weatherapp.data.local.Constants.AR
 import com.weatherapp.data.local.Constants.EN
+import com.weatherapp.data.local.Constants.FORMAT_TYPE
 import com.weatherapp.data.network.Resource
 import java.text.SimpleDateFormat
 import java.time.LocalDateTime
@@ -37,7 +38,7 @@ fun Context.toast(message: String?) {
 
 fun getLocal(): String {
     val lang = Locale.getDefault().language
-    return if (lang != EN && lang != AR)  EN else lang
+    return if (lang != EN && lang != AR) EN else lang
 }
 
 @Composable
@@ -53,6 +54,12 @@ fun Line(
     )
 }
 
+
+fun convertUnixDate(unix: Int): String {
+    val currentDate = Date(unix.toLong() * 1000)
+    val dateFormat = SimpleDateFormat(FORMAT_TYPE, Locale.getDefault())
+    return dateFormat.format(currentDate)
+}
 
 fun formatDate(dateFormat: String): String {
     return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
