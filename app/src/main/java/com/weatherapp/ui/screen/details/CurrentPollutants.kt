@@ -1,15 +1,15 @@
 package com.weatherapp.ui.screen.details
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
@@ -44,29 +44,31 @@ fun CurrentPollutants(
         Text(
             modifier = Modifier.constrainAs(txtHeader) {
                 top.linkTo(parent.top)
-                start.linkTo(parent.start, LARGE_MARGIN)
+                start.linkTo(parent.start)
             },
             text = stringResource(R.string.current_pollutants),
             fontSize = 18.sp,
             color = MaterialTheme.colors.primary
         )
 
-        Line(modifier = Modifier
-            .constrainAs(dividerHeader) {
-                top.linkTo(txtHeader.bottom, SMALL_MARGIN)
-                start.linkTo(parent.start)
-                end.linkTo(parent.end)
-            }
-            .padding(start = LARGE_MARGIN, end = LARGE_MARGIN), thickness = 1.dp
+        Line(
+            modifier = Modifier
+                .constrainAs(dividerHeader) {
+                    top.linkTo(txtHeader.bottom, SMALL_MARGIN)
+                    start.linkTo(parent.start)
+                    end.linkTo(parent.end)
+                }, thickness = 1.dp
         )
 
 
         // First Row
-        Row(modifier = Modifier.constrainAs(firstRow) {
-            top.linkTo(dividerHeader.bottom, MEDIUM_MARGIN)
-            start.linkTo(parent.start)
-            end.linkTo(parent.end)
-        }) {
+        Row(modifier = Modifier
+            .fillMaxWidth()
+            .constrainAs(firstRow) {
+                top.linkTo(dividerHeader.bottom, MEDIUM_MARGIN)
+                start.linkTo(parent.start)
+                end.linkTo(parent.end)
+            }) {
 
             //Ozone
             Pollutant(
@@ -75,7 +77,8 @@ fun CurrentPollutants(
                 color = ozone.color,
                 ug_m3 = "${components?.o3} $UG_M3",
                 description = stringResource(R.string.ozone),
-                modifier = Modifier.padding(top = MEDIUM_MARGIN, end = SMALL_MARGIN)
+                modifier = Modifier.fillMaxWidth(0.5f)
+
             )
             // ParticulatesMatter_25
             Pollutant(
@@ -84,17 +87,19 @@ fun CurrentPollutants(
                 color = pm25.color,
                 ug_m3 = "${components?.pm2_5} $UG_M3",
                 description = stringResource(R.string.particulates_matter2_5),
-                modifier = Modifier.padding(top = MEDIUM_MARGIN)
+                modifier = Modifier.fillMaxWidth().padding(start = MEDIUM_MARGIN)
             )
         }
 
 
         // Second Row
-        Row(modifier = Modifier.constrainAs(secondRow) {
-            top.linkTo(firstRow.bottom, LARGE_MARGIN)
-            start.linkTo(parent.start)
-            end.linkTo(parent.end)
-        }) {
+        Row(modifier = Modifier
+            .fillMaxWidth()
+            .constrainAs(secondRow) {
+                top.linkTo(firstRow.bottom, LARGE_MARGIN)
+                start.linkTo(parent.start)
+                end.linkTo(parent.end)
+            }) {
 
             // ParticulatesMatter_10
             Pollutant(
@@ -103,7 +108,7 @@ fun CurrentPollutants(
                 color = pm10.color,
                 ug_m3 = "${components?.pm10} $UG_M3",
                 description = stringResource(R.string.particulates_matter10),
-                modifier = Modifier.padding(top = MEDIUM_MARGIN, end = SMALL_MARGIN)
+                modifier = Modifier.fillMaxWidth(0.5f)
             )
 
             // NitrogenDioxide
@@ -113,7 +118,7 @@ fun CurrentPollutants(
                 color = no2.color,
                 ug_m3 = "${components?.no2} $UG_M3",
                 description = stringResource(R.string.nitrogen_dioxide),
-                modifier = Modifier.padding(top = MEDIUM_MARGIN)
+                modifier =  Modifier.fillMaxWidth().padding(start = MEDIUM_MARGIN)
             )
         }
     }
@@ -130,9 +135,7 @@ fun Pollutant(
     modifier: Modifier
 ) {
     Column(
-        modifier = Modifier
-            .padding(start = MEDIUM_MARGIN)
-            .width(170.dp)
+        modifier = modifier
     ) {
         Text(
             text = title,
@@ -158,15 +161,20 @@ fun Pollutant(
         Text(
             modifier = Modifier.padding(top = MEDIUM_MARGIN),
             text = ug_m3,
-            color = MaterialTheme.colors.primary
+            color = MaterialTheme.colors.primary,
+            fontWeight = FontWeight.Bold
         )
 
         Text(
-            modifier = modifier,
+            modifier = Modifier
+                .padding(top = MEDIUM_MARGIN)
+                .fillMaxWidth(0.85f),
             text = description,
             color = MaterialTheme.colors.primaryVariant,
             fontSize = 14.sp,
-            lineHeight = 20.sp
+            lineHeight = 20.sp,
+            maxLines = 6,
+            overflow = TextOverflow.Ellipsis
         )
     }
 }

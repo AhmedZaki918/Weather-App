@@ -1,6 +1,7 @@
 package com.weatherapp.ui.screen.city
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -19,7 +20,10 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.navigation.NavHostController
 import com.weatherapp.R
 import com.weatherapp.data.viewmodel.CityViewModel
-import com.weatherapp.ui.theme.*
+import com.weatherapp.ui.theme.BIG_MARGIN
+import com.weatherapp.ui.theme.LARGE_MARGIN
+import com.weatherapp.ui.theme.MEDIUM_MARGIN
+import com.weatherapp.ui.theme.SMALL_MARGIN
 import com.weatherapp.util.Line
 import com.weatherapp.util.toast
 
@@ -63,7 +67,7 @@ fun Header(
     ) {
 
         val context = LocalContext.current
-        val (txtCity, txtCaption, tfCity, btnAdd, txtSuggested, line, icon) = createRefs()
+        val (txtCity, txtCaption, txtSuggested, line, icon, row) = createRefs()
         var textFieldState by remember { mutableStateOf("") }
 
         Text(
@@ -92,53 +96,57 @@ fun Header(
             color = MaterialTheme.colors.primaryVariant
         )
 
-        TextField(
-            modifier = Modifier
-                .constrainAs(tfCity) {
-                    top.linkTo(txtCaption.bottom, LARGE_MARGIN)
-                    start.linkTo(parent.start, MEDIUM_MARGIN)
-                }
-                .background(MaterialTheme.colors.surface),
-            value = textFieldState,
-            onValueChange = {
-                textFieldState = it
-            },
-            placeholder = {
-                Text(
-                    modifier = Modifier.alpha(ContentAlpha.medium),
-                    text = stringResource(id = R.string.enter_city),
-                    color =  MaterialTheme.colors.primary
-                )
-            },
-            textStyle = TextStyle(color =  MaterialTheme.colors.primaryVariant),
-            singleLine = true
-        )
 
-        Button(modifier = Modifier
-            .constrainAs(btnAdd) {
-                top.linkTo(tfCity.top, VERY_SMALL_MARGIN)
-                start.linkTo(tfCity.end, MEDIUM_MARGIN)
-            },
-            colors = ButtonDefaults.buttonColors(backgroundColor =  MaterialTheme.colors.secondary),
-            onClick = {
-                viewModel.saveCityName(textFieldState)
-                context.toast("$textFieldState ${context.resources.getString(R.string.city_saved)}")
-                navController.navigateUp()
-            }) {
-            Text(
-                text = stringResource(id = R.string.add),
-                color =  MaterialTheme.colors.onSecondary, fontSize = 16.sp
+        Row(modifier = Modifier
+            .constrainAs(row) {
+                top.linkTo(txtCaption.bottom, LARGE_MARGIN)
+                start.linkTo(parent.start)
+                end.linkTo(parent.end)
+            }.padding(start = LARGE_MARGIN, end = LARGE_MARGIN)) {
+
+            TextField(
+                modifier = Modifier
+                    .weight(0.6f,false)
+                    .background(MaterialTheme.colors.surface),
+                value = textFieldState,
+                onValueChange = {
+                    textFieldState = it
+                },
+                placeholder = {
+                    Text(
+                        modifier = Modifier.alpha(ContentAlpha.medium),
+                        text = stringResource(id = R.string.enter_city),
+                        color = MaterialTheme.colors.primary
+                    )
+                },
+                textStyle = TextStyle(color = MaterialTheme.colors.primaryVariant),
+                singleLine = true
             )
+
+
+            Button(modifier = Modifier.padding(start = MEDIUM_MARGIN),
+                colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.secondary),
+                onClick = {
+                    viewModel.saveCityName(textFieldState)
+                    context.toast("$textFieldState ${context.resources.getString(R.string.city_saved)}")
+                    navController.navigateUp()
+                }) {
+                Text(
+                    text = stringResource(id = R.string.add),
+                    color = MaterialTheme.colors.onSecondary, fontSize = 16.sp,
+                )
+            }
         }
+
 
         Text(
             modifier = Modifier
                 .constrainAs(txtSuggested) {
-                    top.linkTo(tfCity.bottom, BIG_MARGIN)
+                    top.linkTo(row.bottom, BIG_MARGIN)
                     start.linkTo(icon.end, SMALL_MARGIN)
                 },
             text = stringResource(R.string.suggested),
-            color =  MaterialTheme.colors.primaryVariant
+            color = MaterialTheme.colors.primaryVariant
         )
 
         Icon(
@@ -148,7 +156,7 @@ fun Header(
                     start.linkTo(parent.start, LARGE_MARGIN)
                 },
             painter = painterResource(id = R.drawable.ic_outline_location_city),
-            tint =  MaterialTheme.colors.primaryVariant,
+            tint = MaterialTheme.colors.primaryVariant,
             contentDescription = ""
         )
 

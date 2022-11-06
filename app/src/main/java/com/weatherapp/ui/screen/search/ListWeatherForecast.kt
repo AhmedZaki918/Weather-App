@@ -28,12 +28,14 @@ import com.weatherapp.util.Line
 @Composable
 fun ListWeatherForecast(forecast: ListItem) {
 
-
-    ConstraintLayout(modifier = Modifier.fillMaxWidth()) {
+    ConstraintLayout(
+        modifier = Modifier
+            .fillMaxWidth()
+    ) {
         val (txtDateTime, imageWeather, txtWeather, txtTemp, line) = createRefs()
         val lastIndex = forecast.main?.temp.toString().indexOf(".")
 
-
+        // Time & Date
         Text(
             buildAnnotatedString {
                 withStyle(
@@ -60,18 +62,22 @@ fun ListWeatherForecast(forecast: ListItem) {
                 }
         )
 
-        Image(painter = rememberImagePainter(
-            data = "$IMAGE_URL${forecast.weather?.get(0)?.icon}$SIZE"
-        ),
+        // Weather icon
+        Image(
+            painter = rememberImagePainter(
+                data = "$IMAGE_URL${forecast.weather?.get(0)?.icon}$SIZE"
+            ),
             contentDescription = "",
             modifier = Modifier
                 .constrainAs(imageWeather) {
-                    start.linkTo(txtDateTime.end, LARGE_MARGIN)
+                    start.linkTo(txtDateTime.end, CUSTOM_MARGIN)
                     top.linkTo(txtDateTime.top)
                     bottom.linkTo(txtDateTime.bottom)
-                }.size(50.dp)
+                }
+                .size(50.dp)
         )
 
+        // Description
         Text(
             text = forecast.weather?.get(0)?.description.toString(),
             fontSize = 14.sp,
@@ -81,18 +87,19 @@ fun ListWeatherForecast(forecast: ListItem) {
                     start.linkTo(imageWeather.end, SMALL_MARGIN)
                     top.linkTo(imageWeather.top)
                     bottom.linkTo(imageWeather.bottom)
-                }
+                }.fillMaxWidth(0.2f)
         )
 
-
+        // Temperature
         Text(
             text = forecast.main?.temp.toString().substring(0, lastIndex) + DEGREE,
             fontSize = 20.sp,
-            color = MaterialTheme.colors.primaryVariant,
+            color = MaterialTheme.colors.primary,
             modifier = Modifier
                 .constrainAs(txtTemp) {
                     top.linkTo(txtWeather.top)
-                    end.linkTo(parent.end, LARGE_MARGIN)
+                    start.linkTo(txtWeather.end)
+                    end.linkTo(parent.end)
                 }
         )
 
@@ -107,4 +114,3 @@ fun ListWeatherForecast(forecast: ListItem) {
         )
     }
 }
-

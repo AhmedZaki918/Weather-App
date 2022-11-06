@@ -125,9 +125,10 @@ fun UpdateUi(
     val forecastResponse by viewModel.weatherForecast.collectAsState()
 
     if (forecastResponse is Resource.Success) {
-        fiveDaysForecast = (forecastResponse as Resource.Success<FiveDaysForecastResponse>).value.list!!
+        fiveDaysForecast =
+            (forecastResponse as Resource.Success<FiveDaysForecastResponse>).value.list!!
     } else if (forecastResponse is Resource.Failure) {
-        LaunchedEffect(key1 = true){
+        LaunchedEffect(key1 = true) {
             context.handleApiError(forecastResponse as Resource.Failure)
         }
     }
@@ -264,11 +265,14 @@ fun Header(
         )
 
         CurrentPollutants(
-            modifier = Modifier.constrainAs(txtTitlePollutants) {
-                top.linkTo(txtMoreDes.bottom, BIG_MARGIN)
-                start.linkTo(parent.start)
-                end.linkTo(parent.end)
-            }, viewModel,
+            modifier = Modifier
+                .constrainAs(txtTitlePollutants) {
+                    top.linkTo(txtMoreDes.bottom, BIG_MARGIN)
+                    start.linkTo(parent.start)
+                    end.linkTo(parent.end)
+                }
+                .padding(start = LARGE_MARGIN, end = LARGE_MARGIN),
+            viewModel,
             airPollution
         )
 
