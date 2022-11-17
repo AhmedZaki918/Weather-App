@@ -1,7 +1,5 @@
 package com.weatherapp.ui.screen.home
 
-import android.content.ContentValues.TAG
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -145,9 +143,13 @@ fun UpdateUi(
                 if (geocoding.isNotEmpty()) {
                     latitude = geocoding[0].lat ?: 0.0
                     longitude = geocoding[0].lon ?: 0.0
-                    viewModel.apply {
-                        initCurrentWeather(latitude, longitude, tempUnit)
-                        initFiveDaysForecast(latitude, longitude, tempUnit)
+
+                    LaunchedEffect(key1 = true) {
+                        viewModel.initCurrentWeather(
+                            latitude,
+                            longitude,
+                            viewModel.tempUnit
+                        )
                     }
 
                 } else {
@@ -173,7 +175,7 @@ fun UpdateUi(
         if (forecastResponse is Resource.Success) {
             forecast = (forecastResponse as Resource.Success<FiveDaysForecastResponse>).value.list!!
         } else if (forecastResponse is Resource.Failure) {
-            LaunchedEffect(key1 = true){
+            LaunchedEffect(key1 = true) {
                 context.handleApiError(forecastResponse as Resource.Failure)
             }
         }

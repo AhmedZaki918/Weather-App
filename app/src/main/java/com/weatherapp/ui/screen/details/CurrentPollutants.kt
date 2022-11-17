@@ -33,6 +33,7 @@ fun CurrentPollutants(
     ConstraintLayout(modifier = modifier) {
         val (txtHeader, dividerHeader, firstRow, secondRow) = createRefs()
 
+
         val components = airPollution?.list?.get(0)?.components
         val no2 = viewModel.getNo2Details(components?.no2)
         val pm25 = viewModel.getPm25Details(components?.pm2_5)
@@ -87,7 +88,9 @@ fun CurrentPollutants(
                 color = pm25.color,
                 ug_m3 = "${components?.pm2_5} $UG_M3",
                 description = stringResource(R.string.particulates_matter2_5),
-                modifier = Modifier.fillMaxWidth().padding(start = MEDIUM_MARGIN)
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = MEDIUM_MARGIN)
             )
         }
 
@@ -118,7 +121,9 @@ fun CurrentPollutants(
                 color = no2.color,
                 ug_m3 = "${components?.no2} $UG_M3",
                 description = stringResource(R.string.nitrogen_dioxide),
-                modifier =  Modifier.fillMaxWidth().padding(start = MEDIUM_MARGIN)
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = MEDIUM_MARGIN)
             )
         }
     }

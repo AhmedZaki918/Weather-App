@@ -17,6 +17,7 @@ import com.weatherapp.data.repository.HomeRepo
 import com.weatherapp.util.DataStoreRepo
 import com.weatherapp.util.RequestState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
@@ -30,6 +31,7 @@ class HomeViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val cityState: MutableState<String> = mutableStateOf("")
+
     private val _geocoding = MutableStateFlow<Resource<List<GeocodingResponse>>>(Resource.Idle)
     val geocoding: StateFlow<Resource<List<GeocodingResponse>>> = _geocoding
 
@@ -78,15 +80,16 @@ class HomeViewModel @Inject constructor(
 
     fun initCurrentWeather(lat: Double, lon: Double, tempUnit: String) {
         viewModelScope.launch {
-            _currentWeather.value = repo.getCurrentWeather(lat, lon, tempUnit)
-            requestState.value = RequestState.COMPLETE
-        }
-    }
-
-    fun initFiveDaysForecast(lat: Double, lon: Double, tempUnit: String) {
-        viewModelScope.launch {
-            _weatherForecast.value = repo.getFiveDaysForecast(lat, lon, tempUnit)
-            requestState.value = RequestState.COMPLETE
+                val currentWeather = async {
+                    _currentWeather.value = repo.getCurrentWeather(lat, lon, tempUnit)
+                    requestState.value = RequestState.COMPLETE
+                }
+                currentWeather.await()
+                val fiveDays = async {
+                    _weatherForecast.value = repo.getFiveDaysForecast(lat, lon, tempUnit)
+                    requestState.value = RequestState.COMPLETE
+                }
+                fiveDays.await()
         }
     }
 }

@@ -14,6 +14,7 @@ import com.weatherapp.data.repository.DetailsRepo
 import com.weatherapp.util.DataStoreRepo
 import com.weatherapp.util.RequestState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
@@ -38,6 +39,7 @@ class DetailsViewModel @Inject constructor(
         MutableStateFlow<Resource<FiveDaysForecastResponse>>(Resource.Idle)
     val weatherForecast: StateFlow<Resource<FiveDaysForecastResponse>> = _weatherForecast
 
+
     fun readTempUnit(): String {
         viewModelScope.launch {
             dataStoreRepo.readInt(TEMP_UNIT).collectLatest { unit ->
@@ -51,18 +53,24 @@ class DetailsViewModel @Inject constructor(
         return tempUnit
     }
 
-    fun initGetAirPollution(latitude: Double, longitude: Double) {
-        viewModelScope.launch {
-            _currentPollution.value = repo.getAirPollution(latitude, longitude)
-            requestState.value = RequestState.COMPLETE
-        }
-    }
+    fun initGetDetails(
+        latitude: Double,
+        longitude: Double,
+        tempUnit: String
+    ) {
+            viewModelScope.launch {
+                val airPollution = async {
+                    _currentPollution.value = repo.getAirPollution(latitude, longitude)
+                    requestState.value = RequestState.COMPLETE
+                }
+                airPollution.await()
 
-    fun initFiveDaysForecast(lat: Double, lon: Double, tempUnit: String) {
-        viewModelScope.launch {
-            _weatherForecast.value = repo.getFiveDaysForecast(lat, lon, tempUnit)
-            requestState.value = RequestState.COMPLETE
-        }
+                val forecast = async {
+                    _weatherForecast.value = repo.getFiveDaysForecast(latitude, longitude, tempUnit)
+                    requestState.value = RequestState.COMPLETE
+                }
+                forecast.await()
+            }
     }
 
     fun getAirQuality(value: Int) = repo.airQualityStatus(value)

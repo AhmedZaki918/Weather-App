@@ -84,14 +84,7 @@ fun DetailsScreen(
 
     if (latitude != null && longitude != null) {
         LaunchedEffect(key1 = true) {
-            viewModel.initGetAirPollution(
-                latitude.toDouble(),
-                longitude.toDouble()
-            )
-        }
-
-        LaunchedEffect(key1 = true) {
-            viewModel.initFiveDaysForecast(
+            viewModel.initGetDetails(
                 latitude.toDouble(),
                 longitude.toDouble(),
                 viewModel.readTempUnit()
