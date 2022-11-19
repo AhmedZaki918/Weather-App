@@ -62,31 +62,27 @@ fun SearchScreen(
 
 
     if (viewModel.requestState.value == RequestState.COMPLETE) {
-
         val geocodingResponse by viewModel.geocoding.collectAsState()
         val weatherResponse by viewModel.currentWeather.collectAsState()
         val forecastResponse by viewModel.weatherForecast.collectAsState()
 
+        // Observe on geocoding response from api
         if (geocodingResponse is Resource.Success) {
             val response = geocodingResponse as Resource.Success<List<GeocodingResponse>>
             response.value.also { geocoding ->
                 if (geocoding.isNotEmpty()) {
-                    val lat = geocoding[0].lat ?: 0.0
-                    val lon = geocoding[0].lon ?: 0.0
-                    viewModel.apply {
-                        initCurrentWeather(lat, lon, tempUnit)
-                        initFiveDaysForecast(lat, lon, tempUnit)
-                    }
-                } else {
-                    DisplayInvalidSearch(navController, viewModel)
-                }
+                    viewModel.initCurrentWeather(
+                        geocoding[0].lat ?: 0.0,
+                        geocoding[0].lon ?: 0.0
+                    )
+                } else DisplayInvalidSearch(navController, viewModel)
             }
         } else if (geocodingResponse is Resource.Failure) {
             context.handleApiError(geocodingResponse as Resource.Failure)
             viewModel.requestState.value = RequestState.IDLE
         }
 
-
+        // Observe on weather response from api
         if (weatherResponse is Resource.Success) {
             currentWeather = (weatherResponse as Resource.Success<CurrentWeatherResponse>).value
             windSpeed = currentWeather.wind?.speed?.times(60)?.times(60)?.div(1000)?.toInt()
@@ -94,7 +90,7 @@ fun SearchScreen(
             context.handleApiError(weatherResponse as Resource.Failure)
         }
 
-
+        // Observe on forecast response from api
         if (forecastResponse is Resource.Success) {
             forecast = (forecastResponse as Resource.Success<FiveDaysForecastResponse>).value.list!!
         } else if (forecastResponse is Resource.Failure) {

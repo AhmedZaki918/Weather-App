@@ -40,7 +40,8 @@ class DetailsViewModel @Inject constructor(
     val weatherForecast: StateFlow<Resource<FiveDaysForecastResponse>> = _weatherForecast
 
 
-    fun readTempUnit(): String {
+    init {
+        // Read temperature unit from user preferences
         viewModelScope.launch {
             dataStoreRepo.readInt(TEMP_UNIT).collectLatest { unit ->
                 tempUnit = when (unit) {
@@ -50,27 +51,31 @@ class DetailsViewModel @Inject constructor(
                 }
             }
         }
-        return tempUnit
     }
+
 
     fun initGetDetails(
         latitude: Double,
-        longitude: Double,
-        tempUnit: String
+        longitude: Double
     ) {
-            viewModelScope.launch {
-                val airPollution = async {
-                    _currentPollution.value = repo.getAirPollution(latitude, longitude)
-                    requestState.value = RequestState.COMPLETE
-                }
-                airPollution.await()
-
-                val forecast = async {
-                    _weatherForecast.value = repo.getFiveDaysForecast(latitude, longitude, tempUnit)
-                    requestState.value = RequestState.COMPLETE
-                }
-                forecast.await()
+        viewModelScope.launch {
+            val airPollution = async {
+                repo.getAirPollution(latitude, longitude)
             }
+            val forecast = async {
+                repo.getFiveDaysForecast(latitude, longitude, tempUnit)
+            }
+            updateUi(airPollution.await(), forecast.await())
+        }
+    }
+
+    private fun updateUi(
+        airPollutionResponse: Resource<AirPollutionResponse>,
+        forecastResponse: Resource<FiveDaysForecastResponse>
+    ) {
+        _currentPollution.value = airPollutionResponse
+        _weatherForecast.value = forecastResponse
+        requestState.value = RequestState.COMPLETE
     }
 
     fun getAirQuality(value: Int) = repo.airQualityStatus(value)

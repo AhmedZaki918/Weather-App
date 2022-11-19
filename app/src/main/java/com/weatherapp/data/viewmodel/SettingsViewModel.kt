@@ -30,7 +30,6 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
-
     fun retrieveString(key: Preferences.Key<String>) =
         dataStore.readString(key)
 

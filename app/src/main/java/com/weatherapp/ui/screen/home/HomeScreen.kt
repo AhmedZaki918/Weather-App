@@ -1,5 +1,7 @@
 package com.weatherapp.ui.screen.home
 
+import android.content.ContentValues.TAG
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -143,13 +145,9 @@ fun UpdateUi(
                 if (geocoding.isNotEmpty()) {
                     latitude = geocoding[0].lat ?: 0.0
                     longitude = geocoding[0].lon ?: 0.0
-
+                    Log.d(TAG, "UpdateUi: $latitude $longitude")
                     LaunchedEffect(key1 = true) {
-                        viewModel.initCurrentWeather(
-                            latitude,
-                            longitude,
-                            viewModel.tempUnit
-                        )
+                        viewModel.initCurrentWeather(latitude, longitude)
                     }
 
                 } else {

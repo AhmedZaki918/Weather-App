@@ -19,7 +19,6 @@ class CityViewModel @Inject constructor(
     fun getAllCities() =
         repo.getCities()
 
-
     fun saveCityIndex(index: Int) {
         viewModelScope.launch {
             dataStore.writeInt(CITY_INDEX,index)

@@ -15,6 +15,7 @@ import com.weatherapp.data.repository.SearchRepo
 import com.weatherapp.util.DataStoreRepo
 import com.weatherapp.util.RequestState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
@@ -27,6 +28,10 @@ class SearchViewModel @Inject constructor(
     private val dataStoreRepo: DataStoreRepo
 ) : ViewModel() {
 
+    private var tempUnit = ""
+    val searchTextState: MutableState<String> = mutableStateOf("")
+    val requestState: MutableState<RequestState> = mutableStateOf(RequestState.IDLE)
+
     private val _geocoding = MutableStateFlow<Resource<List<GeocodingResponse>>>(Resource.Idle)
     val geocoding: StateFlow<Resource<List<GeocodingResponse>>> = _geocoding
 
@@ -36,13 +41,6 @@ class SearchViewModel @Inject constructor(
     private val _weatherForecast =
         MutableStateFlow<Resource<FiveDaysForecastResponse>>(Resource.Idle)
     val weatherForecast: StateFlow<Resource<FiveDaysForecastResponse>> = _weatherForecast
-
-    val searchTextState: MutableState<String> = mutableStateOf("")
-
-    val requestState: MutableState<RequestState> =
-        mutableStateOf(RequestState.IDLE)
-
-    var tempUnit = ""
 
 
     init {
@@ -65,15 +63,23 @@ class SearchViewModel @Inject constructor(
         }
     }
 
-    fun initCurrentWeather(lat: Double, lon: Double, tempUnit: String) {
+    fun initCurrentWeather(latitude: Double, longitude: Double) {
         viewModelScope.launch {
-            _currentWeather.value = repo.getCurrentWeather(lat, lon, tempUnit)
+            val weather = async {
+                repo.getCurrentWeather(latitude, longitude, tempUnit)
+            }
+            val forecast = async {
+                repo.getFiveDaysForecast(latitude, longitude, tempUnit)
+            }
+            updateUi(weather.await(), forecast.await())
         }
     }
 
-    fun initFiveDaysForecast(lat: Double, lon: Double, tempUnit: String) {
-        viewModelScope.launch {
-            _weatherForecast.value = repo.getFiveDaysForecast(lat, lon, tempUnit)
-        }
+    private fun updateUi(
+        weatherResponse: Resource<CurrentWeatherResponse>,
+        forecastResponse: Resource<FiveDaysForecastResponse>
+    ) {
+        _currentWeather.value = weatherResponse
+        _weatherForecast.value = forecastResponse
     }
 }

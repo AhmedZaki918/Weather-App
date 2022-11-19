@@ -30,6 +30,8 @@ class HomeViewModel @Inject constructor(
     private val dataStoreRepo: DataStoreRepo
 ) : ViewModel() {
 
+    var tempUnit = ""
+    val requestState: MutableState<RequestState> = mutableStateOf(RequestState.IDLE)
     private val cityState: MutableState<String> = mutableStateOf("")
 
     private val _geocoding = MutableStateFlow<Resource<List<GeocodingResponse>>>(Resource.Idle)
@@ -42,54 +44,48 @@ class HomeViewModel @Inject constructor(
         MutableStateFlow<Resource<FiveDaysForecastResponse>>(Resource.Idle)
     val weatherForecast: StateFlow<Resource<FiveDaysForecastResponse>> = _weatherForecast
 
-    val requestState: MutableState<RequestState> =
-        mutableStateOf(RequestState.IDLE)
-
-    var tempUnit = ""
 
     init {
-        readTempUnit()
         viewModelScope.launch {
-            dataStoreRepo.readString(CITY_NAME).collectLatest {
-                cityState.value = it.ifEmpty { DEFAULT_CITY }
-                initGeocoding(cityState.value)
-            }
-        }
-    }
-
-
-    private fun readTempUnit() {
-        viewModelScope.launch {
-            dataStoreRepo.readInt(TEMP_UNIT).collectLatest { unit ->
-                tempUnit = when (unit) {
-                    0 -> METRIC
-                    1 -> IMPERIAL
-                    else -> METRIC
+            // Read temperature unit from user preferences
+            val temp = async {
+                dataStoreRepo.readInt(TEMP_UNIT).collectLatest { unit ->
+                    tempUnit = when (unit) {
+                        0 -> METRIC
+                        1 -> IMPERIAL
+                        else -> METRIC
+                    }
                 }
             }
+
+            // Read city name from user preferences
+            val cityName = async {
+                dataStoreRepo.readString(CITY_NAME).collectLatest {
+                    cityState.value = it.ifEmpty { DEFAULT_CITY }
+                    // create geocoding api request from repo
+                    _geocoding.value = repo.getGeocoding(cityState.value)
+                    requestState.value = RequestState.COMPLETE
+                }
+            }
+            temp.await()
+            cityName.await()
         }
     }
 
-
-    private fun initGeocoding(city: String) {
+    fun initCurrentWeather(lat: Double, lon: Double) {
         viewModelScope.launch {
-            _geocoding.value = repo.getGeocoding(city)
-            requestState.value = RequestState.COMPLETE
+            val weather = async { repo.getCurrentWeather(lat, lon, tempUnit) }
+            val forecast = async { repo.getFiveDaysForecast(lat, lon, tempUnit) }
+            updateUi(weather.await(), forecast.await())
         }
     }
 
-    fun initCurrentWeather(lat: Double, lon: Double, tempUnit: String) {
-        viewModelScope.launch {
-                val currentWeather = async {
-                    _currentWeather.value = repo.getCurrentWeather(lat, lon, tempUnit)
-                    requestState.value = RequestState.COMPLETE
-                }
-                currentWeather.await()
-                val fiveDays = async {
-                    _weatherForecast.value = repo.getFiveDaysForecast(lat, lon, tempUnit)
-                    requestState.value = RequestState.COMPLETE
-                }
-                fiveDays.await()
-        }
+    private fun updateUi(
+        weather: Resource<CurrentWeatherResponse>,
+        forecast: Resource<FiveDaysForecastResponse>
+    ) {
+        _currentWeather.value = weather
+        _weatherForecast.value = forecast
+        requestState.value = RequestState.COMPLETE
     }
 }

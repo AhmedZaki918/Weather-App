@@ -86,8 +86,7 @@ fun DetailsScreen(
         LaunchedEffect(key1 = true) {
             viewModel.initGetDetails(
                 latitude.toDouble(),
-                longitude.toDouble(),
-                viewModel.readTempUnit()
+                longitude.toDouble()
             )
         }
     }
