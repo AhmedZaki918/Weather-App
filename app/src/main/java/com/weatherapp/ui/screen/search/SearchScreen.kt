@@ -110,7 +110,10 @@ fun SearchScreen(
         }
 
         items(forecast) {
-            ListWeatherForecast(forecast = it)
+            ListWeatherForecast(
+                forecast = it,
+                timeVisibility = false
+            )
         }
     }
 }

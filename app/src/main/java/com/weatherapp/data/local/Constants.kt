@@ -12,6 +12,7 @@ object Constants {
     // Image urls
     const val IMAGE_URL = "http://openweathermap.org/img/wn/"
     const val SIZE = "@2x.png"
+    const val CLOUD = "04n"
 
     const val DEFAULT_CITY = "Cairo"
     const val CITY_SCREEN = "city"
@@ -52,4 +53,5 @@ object Constants {
     const val CLOUDINESS = "cloudiness percent"
 
     const val UG_M3 = "ug/m3"
+    const val TWELVE_PM = "12:00"
 }

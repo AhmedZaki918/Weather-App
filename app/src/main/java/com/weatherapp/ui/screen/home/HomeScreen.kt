@@ -1,15 +1,12 @@
 package com.weatherapp.ui.screen.home
 
-import android.content.ContentValues.TAG
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -37,27 +34,25 @@ import com.weatherapp.data.local.Constants.F_UNIT
 import com.weatherapp.data.local.Constants.IMAGE_URL
 import com.weatherapp.data.local.Constants.METRIC
 import com.weatherapp.data.local.Constants.SIZE
+import com.weatherapp.data.local.Constants.TWELVE_PM
 import com.weatherapp.data.model.forecast.FiveDaysForecastResponse
 import com.weatherapp.data.model.forecast.ListItem
 import com.weatherapp.data.model.geocoding.GeocodingResponse
 import com.weatherapp.data.model.weather.CurrentWeatherResponse
 import com.weatherapp.data.network.Resource
 import com.weatherapp.data.viewmodel.HomeViewModel
+import com.weatherapp.ui.screen.search.ListWeatherForecast
 import com.weatherapp.ui.theme.*
-import com.weatherapp.util.Circle
-import com.weatherapp.util.RequestState
-import com.weatherapp.util.formatDate
-import com.weatherapp.util.handleApiError
+import com.weatherapp.util.*
 
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel,
     navController: NavHostController
 ) {
+    val forecastState = remember { mutableStateOf<List<ListItem>>(listOf()) }
+    val apiError = remember { mutableStateOf("") }
 
-    val apiError = remember {
-        mutableStateOf("")
-    }
 
     viewModel.requestState.value.also { state ->
         when (state) {
@@ -68,9 +63,11 @@ fun HomeScreen(
                 UpdateUi(
                     viewModel,
                     apiError,
-                    navController
+                    navController,
+                    forecastState
                 )
             }
+
             RequestState.ERROR -> {
                 Box(
                     modifier = Modifier
@@ -92,6 +89,57 @@ fun HomeScreen(
 
 
 @Composable
+fun UpdateUi(
+    viewModel: HomeViewModel,
+    apiError: MutableState<String>,
+    navController: NavHostController,
+    forecastState: MutableState<List<ListItem>>
+) {
+    LazyColumn(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(bottom = BIG_MARGIN)
+    ) {
+
+        item {
+            Header(
+                viewModel,
+                apiError,
+                navController,
+                forecastState
+            )
+        }
+
+        // Forecast in next 5 days
+        if (forecastState.value.isNotEmpty()) {
+            var savedDate: String? = null
+            val savedTime = TWELVE_PM
+
+            // Display the list in 5 days forecast
+            itemsIndexed(forecastState.value) { index, item ->
+                // Save date and time (first time only)
+                if (index == 0) {
+                    savedDate = forecastState.value[index].dt_txt
+                }
+
+                // Extract date and time to use it in comparison
+                val currentDate = forecastState.value[index].dt_txt?.substring(0, 10)
+                val currentTime = forecastState.value[index].dt_txt?.substring(11, 16)
+
+                // Display the next 5 days forecast on 3:00 pm only
+                if (currentDate != savedDate && currentTime == savedTime) {
+                    savedDate = currentDate
+                    ListWeatherForecast(
+                        forecast = item,
+                        timeVisibility = true
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
 fun LoadingScreen() {
     Box(
         modifier = Modifier
@@ -106,26 +154,24 @@ fun LoadingScreen() {
 
 @ExperimentalCoilApi
 @Composable
-fun UpdateUi(
+fun Header(
     viewModel: HomeViewModel,
     apiError: MutableState<String>,
-    navController: NavHostController
+    navController: NavHostController,
+    forecastState: MutableState<List<ListItem>>
 ) {
-
     val context = LocalContext.current
-    val scrollState = rememberScrollState()
     var data: CurrentWeatherResponse? = null
-    var forecast: List<ListItem> = listOf()
     var windSpeed: Int? = null
     var latitude = 0.0
     var longitude = 0.0
+
 
     ConstraintLayout(
         modifier = Modifier
             .background(MaterialTheme.colors.background)
             .fillMaxSize()
-            .verticalScroll(scrollState)
-            .padding(bottom = 70.dp)
+            .padding(bottom = MEDIUM_MARGIN)
     ) {
 
         val (
@@ -134,18 +180,19 @@ fun UpdateUi(
             boxHumidityPercentage, txtHumidity, txtDate, lrWeather, coContainer, btnMore
         ) = createRefs()
 
+        // Observe on state flow values from view models
         val geocodingResponse by viewModel.geocoding.collectAsState()
         val weatherResponse by viewModel.currentWeather.collectAsState()
         val forecastResponse by viewModel.weatherForecast.collectAsState()
 
 
+        // Observe on geocoding response from api
         if (geocodingResponse is Resource.Success) {
             val response = geocodingResponse as Resource.Success<List<GeocodingResponse>>
             response.value.also { geocoding ->
                 if (geocoding.isNotEmpty()) {
                     latitude = geocoding[0].lat ?: 0.0
                     longitude = geocoding[0].lon ?: 0.0
-                    Log.d(TAG, "UpdateUi: $latitude $longitude")
                     LaunchedEffect(key1 = true) {
                         viewModel.initCurrentWeather(latitude, longitude)
                     }
@@ -162,6 +209,7 @@ fun UpdateUi(
         }
 
 
+        // Observe on weather response from api
         if (weatherResponse is Resource.Success) {
             data = (weatherResponse as Resource.Success<CurrentWeatherResponse>).value
             windSpeed = data?.wind?.speed?.times(60)?.times(60)?.div(1000)?.toInt()
@@ -170,8 +218,10 @@ fun UpdateUi(
         }
 
 
+        // Observe on forecast response from api
         if (forecastResponse is Resource.Success) {
-            forecast = (forecastResponse as Resource.Success<FiveDaysForecastResponse>).value.list!!
+            forecastState.value =
+                (forecastResponse as Resource.Success<FiveDaysForecastResponse>).value.list!!
         } else if (forecastResponse is Resource.Failure) {
             LaunchedEffect(key1 = true) {
                 context.handleApiError(forecastResponse as Resource.Failure)
@@ -183,7 +233,7 @@ fun UpdateUi(
             val unitLetter = if (viewModel.tempUnit == METRIC) C_UNIT else F_UNIT
             val lastIndex = data?.main?.temp.toString().indexOf(".")
 
-
+            // Current location
             Text(
                 text = data?.name.toString(),
                 color = MaterialTheme.colors.primary,
@@ -196,7 +246,6 @@ fun UpdateUi(
                     }
             )
 
-
             Icon(
                 painter = painterResource(id = R.drawable.ic_outline_location),
                 contentDescription = "",
@@ -208,7 +257,6 @@ fun UpdateUi(
                         end.linkTo(txtLocation.start, SMALL_MARGIN)
                     }
             )
-
 
             Column(
                 modifier = Modifier
@@ -224,6 +272,7 @@ fun UpdateUi(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
 
+                // Temperature
                 Text(
                     text = "${data?.main?.temp.toString().substring(0, lastIndex)}$unitLetter",
                     fontSize = 90.sp,
@@ -231,6 +280,7 @@ fun UpdateUi(
                     color = MaterialTheme.colors.primary
                 )
 
+                // Feels like
                 Text(
                     text = "${stringResource(id = R.string.feels_like)} ${
                         data?.main?.feels_like.toString().substring(0, lastIndex)
@@ -240,14 +290,13 @@ fun UpdateUi(
                     modifier = Modifier.padding(top = SMALL_MARGIN)
                 )
 
-
+                // Weather description
                 Text(
                     text = data?.weather?.get(0)?.description.toString(),
                     fontSize = 18.sp,
                     color = MaterialTheme.colors.secondary,
                     modifier = Modifier.padding(top = VERY_SMALL_MARGIN)
                 )
-
 
                 Image(
                     painter = rememberImagePainter(
@@ -270,6 +319,7 @@ fun UpdateUi(
                     }
             )
 
+            // Wind speed
             Text(
                 text = "$windSpeed ${stringResource(id = R.string.km_h)}",
                 fontSize = 16.sp,
@@ -281,7 +331,7 @@ fun UpdateUi(
                     }
             )
 
-
+            // More
             Button(
                 onClick = {
                     navController.navigate(
@@ -310,7 +360,6 @@ fun UpdateUi(
             }
 
 
-
             Icon(
                 painter = painterResource(id = R.drawable.ic_outline_visibility),
                 contentDescription = "",
@@ -322,7 +371,7 @@ fun UpdateUi(
                     }
             )
 
-
+            // Visibility
             Text(
                 text = "${stringResource(id = R.string.visibility)} ${data?.visibility?.div(1000)} ${
                     stringResource(id = R.string.km)
@@ -336,7 +385,7 @@ fun UpdateUi(
                     }
             )
 
-
+            // Humidity circle
             Circle(
                 modifier = Modifier
                     .constrainAs(boxHumidityPercentage) {
@@ -353,6 +402,7 @@ fun UpdateUi(
                 }, MaterialTheme.colors.secondary
             )
 
+            // Humidity title
             Text(
                 text = stringResource(R.string.humidity),
                 color = MaterialTheme.colors.primaryVariant,
@@ -364,7 +414,7 @@ fun UpdateUi(
                 }
             )
 
-
+            // Today date
             Text(
                 buildAnnotatedString {
                     withStyle(
@@ -390,7 +440,7 @@ fun UpdateUi(
                     }
             )
 
-
+            // Today weather every 3 hours
             LazyRow(
                 modifier = Modifier
                     .constrainAs(lrWeather) {
@@ -400,8 +450,10 @@ fun UpdateUi(
                     }
                     .padding(start = MEDIUM_MARGIN, end = MEDIUM_MARGIN)
             ) {
-                items(forecast) {
-                    ListTodayWeather(forecast = it)
+                itemsIndexed(forecastState.value) { index, item ->
+                    if (index <= 8) {
+                        ListTodayWeather(forecast = item)
+                    }
                 }
             }
         }

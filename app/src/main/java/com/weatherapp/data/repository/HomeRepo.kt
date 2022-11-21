@@ -38,7 +38,7 @@ class HomeRepo @Inject constructor(
             API_KEY,
             lat,
             lon,
-            9,
+            40,
             tempUnit,
            getLocal()
         )

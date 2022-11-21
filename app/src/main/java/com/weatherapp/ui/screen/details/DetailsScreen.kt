@@ -3,13 +3,12 @@ package com.weatherapp.ui.screen.details
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
@@ -30,7 +29,13 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
+import coil.compose.rememberImagePainter
 import com.weatherapp.R
+import com.weatherapp.data.local.Constants
+import com.weatherapp.data.local.Constants.CLOUD
+import com.weatherapp.data.local.Constants.IMAGE_URL
+import com.weatherapp.data.local.Constants.SIZE
+import com.weatherapp.data.local.Constants.TWELVE_PM
 import com.weatherapp.data.model.AirQuality
 import com.weatherapp.data.model.forecast.FiveDaysForecastResponse
 import com.weatherapp.data.model.forecast.ListItem
@@ -135,7 +140,10 @@ fun UpdateUi(
             Header(viewModel, apiError, cloudiness)
         }
         items(fiveDaysForecast) {
-            ListWeatherForecast(forecast = it)
+            ListWeatherForecast(
+                forecast = it,
+                timeVisibility = false
+            )
         }
     }
 }
@@ -280,14 +288,18 @@ fun Header(
             color = MaterialTheme.colors.primary
         )
 
-        Icon(
-            modifier = Modifier.constrainAs(iconCloud) {
-                top.linkTo(txtCloudinessTitle.top)
-                bottom.linkTo(txtCloudinessTitle.bottom)
-                start.linkTo(txtCloudinessTitle.end, SMALL_MARGIN)
-            }, painter = painterResource(id = R.drawable.preview_all_cloud),
+        Image(
+            modifier = Modifier
+                .constrainAs(iconCloud) {
+                    top.linkTo(txtCloudinessTitle.top)
+                    bottom.linkTo(txtCloudinessTitle.bottom)
+                    start.linkTo(txtCloudinessTitle.end, SMALL_MARGIN)
+                }
+                .size(40.dp),
             contentDescription = "",
-            tint = MaterialTheme.colors.primary
+            painter = rememberImagePainter(
+                data = "$IMAGE_URL$CLOUD$SIZE"
+            )
         )
 
         // Line

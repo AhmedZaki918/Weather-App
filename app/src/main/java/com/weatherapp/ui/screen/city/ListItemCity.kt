@@ -12,7 +12,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.navigation.NavHostController
@@ -78,14 +77,4 @@ fun ListItemCity(
                 .padding(start = LARGE_MARGIN, end = LARGE_MARGIN))
         }
     }
-}
-
-
-@ExperimentalMaterialApi
-@Preview
-@Composable
-fun ListItemCityPreview() {
-//    ListItemCity(
-//        City("Cairo"),
-//    )
 }

@@ -26,7 +26,10 @@ import com.weatherapp.util.Line
 
 
 @Composable
-fun ListWeatherForecast(forecast: ListItem) {
+fun ListWeatherForecast(
+    forecast: ListItem,
+    timeVisibility: Boolean
+) {
 
     ConstraintLayout(
         modifier = Modifier
@@ -36,31 +39,63 @@ fun ListWeatherForecast(forecast: ListItem) {
         val lastIndex = forecast.main?.temp.toString().indexOf(".")
 
         // Time & Date
-        Text(
-            buildAnnotatedString {
-                withStyle(
-                    style = SpanStyle(
-                        color = MaterialTheme.colors.primaryVariant,
-                        fontSize = 14.sp
-                    )
-                ) {
-                    append("${forecast.dt_txt?.substring(0, 10)}\n")
-                }
-                withStyle(
-                    style = SpanStyle(
-                        color = MaterialTheme.colors.secondary,
-                        fontSize = 16.sp
-                    )
-                ) {
-                    append(forecast.dt_txt?.substring(11, 16).toString())
-                }
-            },
-            modifier = Modifier
-                .constrainAs(txtDateTime) {
-                    start.linkTo(parent.start, LARGE_MARGIN)
-                    top.linkTo(parent.top, CUSTOM_MARGIN)
-                }
-        )
+        if (timeVisibility) {
+            // Display date only
+            Text(
+                buildAnnotatedString {
+                    withStyle(
+                        style = SpanStyle(
+                            color = MaterialTheme.colors.primaryVariant,
+                            fontSize = 16.sp
+                        )
+                    ) {
+                        append("${forecast.dt_txt?.substring(0, 8)}")
+                    }
+                    withStyle(
+                        style = SpanStyle(
+                            color = MaterialTheme.colors.secondary,
+                            fontSize = 16.sp
+                        )
+                    ) {
+                        append(forecast.dt_txt?.substring(8, 10).toString())
+                    }
+                },
+                modifier = Modifier
+                    .constrainAs(txtDateTime) {
+                        start.linkTo(parent.start, LARGE_MARGIN)
+                        top.linkTo(parent.top, CUSTOM_MARGIN)
+                    }
+            )
+
+        } else {
+            // Display time and date
+            Text(
+                buildAnnotatedString {
+                    withStyle(
+                        style = SpanStyle(
+                            color = MaterialTheme.colors.primaryVariant,
+                            fontSize = 14.sp
+                        )
+                    ) {
+                        append("${forecast.dt_txt?.substring(0, 10)}\n")
+                    }
+                    withStyle(
+                        style = SpanStyle(
+                            color = MaterialTheme.colors.secondary,
+                            fontSize = 16.sp
+                        )
+                    ) {
+                        append(forecast.dt_txt?.substring(11, 16).toString())
+                    }
+                },
+                modifier = Modifier
+                    .constrainAs(txtDateTime) {
+                        start.linkTo(parent.start, LARGE_MARGIN)
+                        top.linkTo(parent.top, CUSTOM_MARGIN)
+                    }
+            )
+        }
+
 
         // Weather icon
         Image(
@@ -87,7 +122,8 @@ fun ListWeatherForecast(forecast: ListItem) {
                     start.linkTo(imageWeather.end, SMALL_MARGIN)
                     top.linkTo(imageWeather.top)
                     bottom.linkTo(imageWeather.bottom)
-                }.fillMaxWidth(0.2f)
+                }
+                .fillMaxWidth(0.2f)
         )
 
         // Temperature

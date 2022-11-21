@@ -30,7 +30,7 @@ class DetailsRepo @Inject constructor(
             API_KEY,
             lat,
             lon,
-            36,
+            40,
             tempUnit,
             getLocal()
         )
