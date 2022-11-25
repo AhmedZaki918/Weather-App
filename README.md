@@ -15,11 +15,15 @@ Jetpack Compose [The modern ui toolkit for building native ui on android].
 
 ## Screenshots
 
-<img src="images/1- Home.jpg" width="250"> <img src="images/2- Search.jpg" width="250">
+<img src="images/1- Home.jpg" width="250"> <img src="images/1-2 Home.jpg" width="250">
+<img src="images/1 - 3 More.jpg" width="250">
+<img src="images/2- Search.jpg" width="250">
 <img src="images/3- Search Details.jpg" width="250">
 <img src="images/5- Temp Unit.jpg" width="250">
 <img src="images/6- Add City.jpg" width="250">
 <img src="images/7- Home.jpg" width="250">
+<img src="images/7 - 2 Home.jpg" width="250">
+<img src="images/7- 3 Home.jpg" width="250">
 <img src="images/8- Search.jpg" width="250">
 <img src="images/9- Search Details.jpg" width="250">
 <img src="images/11- Temp Unit.jpg" width="250">
