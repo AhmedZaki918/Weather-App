@@ -55,9 +55,9 @@ fun Line(
 }
 
 
-fun convertUnixDate(unix: Int): String {
+fun convertUnixDate(unix: Int,format:String): String {
     val currentDate = Date(unix.toLong() * 1000)
-    val dateFormat = SimpleDateFormat(FORMAT_TYPE, Locale.getDefault())
+    val dateFormat = SimpleDateFormat(format, Locale.getDefault())
     return dateFormat.format(currentDate)
 }
 

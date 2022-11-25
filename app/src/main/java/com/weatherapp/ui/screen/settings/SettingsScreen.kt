@@ -22,7 +22,6 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.navigation.NavHostController
 import com.weatherapp.R
 import com.weatherapp.data.local.Constants.CITY_INDEX
-import com.weatherapp.data.local.Constants.CITY_NAME
 import com.weatherapp.data.local.Constants.CITY_SCREEN
 import com.weatherapp.data.local.Constants.DARK_THEME
 import com.weatherapp.data.local.Constants.TEMP_UNIT
@@ -44,8 +43,7 @@ fun SettingsScreen(
     val sheetState = rememberBottomSheetState(initialValue = BottomSheetValue.Collapsed)
     val scaffoldState = rememberBottomSheetScaffoldState(bottomSheetState = sheetState)
     var tempUnitState by remember { mutableStateOf(2) }
-    var cityState by remember { mutableStateOf(-1) }
-    var cityByUserState by remember { mutableStateOf("") }
+    var cityIndexState by remember { mutableStateOf(-1) }
 
 
     LaunchedEffect(key1 = true) {
@@ -56,15 +54,10 @@ fun SettingsScreen(
 
     LaunchedEffect(key1 = true) {
         viewModel.retrieveInt(CITY_INDEX).collectLatest {
-            cityState = it
+            cityIndexState = it
         }
     }
 
-    LaunchedEffect(key1 = true) {
-        viewModel.retrieveString(CITY_NAME).collectLatest {
-            cityByUserState = it
-        }
-    }
 
     BottomSheetScaffold(
         sheetShape = Shapes.small,
@@ -142,11 +135,7 @@ fun SettingsScreen(
                 .padding(start = MEDIUM_MARGIN, end = MEDIUM_MARGIN)
                 .fillMaxWidth(),
                 title = stringResource(R.string.city),
-                if (cityByUserState != "") {
-                    cityByUserState
-                } else {
-                    viewModel.selectedCity(cityState)
-                },
+                viewModel.selectedCity(cityIndexState),
                 onButtonClicked = {
                     navController.navigate(CITY_SCREEN)
                 },

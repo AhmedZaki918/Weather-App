@@ -5,12 +5,13 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
@@ -20,7 +21,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -31,11 +31,10 @@ import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import coil.compose.rememberImagePainter
 import com.weatherapp.R
-import com.weatherapp.data.local.Constants
 import com.weatherapp.data.local.Constants.CLOUD
+import com.weatherapp.data.local.Constants.FORMAT_TYPE
 import com.weatherapp.data.local.Constants.IMAGE_URL
 import com.weatherapp.data.local.Constants.SIZE
-import com.weatherapp.data.local.Constants.TWELVE_PM
 import com.weatherapp.data.model.AirQuality
 import com.weatherapp.data.model.forecast.FiveDaysForecastResponse
 import com.weatherapp.data.model.forecast.ListItem
@@ -120,6 +119,7 @@ fun UpdateUi(
     val context = LocalContext.current
     var fiveDaysForecast: List<ListItem> = listOf()
     val forecastResponse by viewModel.weatherForecast.collectAsState()
+
 
     if (forecastResponse is Resource.Success) {
         fiveDaysForecast =
@@ -216,7 +216,7 @@ fun Header(
                         fontSize = 14.sp
                     )
                 ) {
-                    append(convertUnixDate(airPollution?.list?.get(0)?.dt ?: 0))
+                    append(convertUnixDate(airPollution?.list?.get(0)?.dt ?: 0, FORMAT_TYPE))
                 }
             },
             modifier = Modifier
@@ -247,7 +247,6 @@ fun Header(
                 fontSize = 18.sp
             )
         }
-
 
 
         Text(

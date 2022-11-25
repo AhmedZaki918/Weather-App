@@ -43,13 +43,17 @@ import com.weatherapp.data.network.Resource
 import com.weatherapp.data.viewmodel.HomeViewModel
 import com.weatherapp.ui.screen.search.ListWeatherForecast
 import com.weatherapp.ui.theme.*
-import com.weatherapp.util.*
+import com.weatherapp.util.Circle
+import com.weatherapp.util.RequestState
+import com.weatherapp.util.formatDate
+import com.weatherapp.util.handleApiError
 
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel,
     navController: NavHostController
 ) {
+
     val forecastState = remember { mutableStateOf<List<ListItem>>(listOf()) }
     val apiError = remember { mutableStateOf("") }
 
@@ -64,7 +68,7 @@ fun HomeScreen(
                     viewModel,
                     apiError,
                     navController,
-                    forecastState
+                    forecastState,
                 )
             }
 
@@ -93,7 +97,7 @@ fun UpdateUi(
     viewModel: HomeViewModel,
     apiError: MutableState<String>,
     navController: NavHostController,
-    forecastState: MutableState<List<ListItem>>
+    forecastState: MutableState<List<ListItem>>,
 ) {
     LazyColumn(
         modifier = Modifier
@@ -106,7 +110,7 @@ fun UpdateUi(
                 viewModel,
                 apiError,
                 navController,
-                forecastState
+                forecastState,
             )
         }
 
@@ -158,7 +162,7 @@ fun Header(
     viewModel: HomeViewModel,
     apiError: MutableState<String>,
     navController: NavHostController,
-    forecastState: MutableState<List<ListItem>>
+    forecastState: MutableState<List<ListItem>>,
 ) {
     val context = LocalContext.current
     var data: CurrentWeatherResponse? = null
