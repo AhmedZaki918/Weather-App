@@ -10,7 +10,7 @@
 
 ## General info
 
-Sample weather android app to get any location you want by city name or state code, implemented with lastest technology on android
+Sample weather android app to get any location on Earth you want by city name or state code, implemented with lastest technology on android
 Jetpack Compose [The modern ui toolkit for building native ui on android].
 
 ## Screenshots
@@ -30,11 +30,13 @@ Jetpack Compose [The modern ui toolkit for building native ui on android].
 <img src="images/12- Add City.jpg" width="250">
 
 ## Functionality
-- Search any location you want by city name or state code
-- Sugessted cities to know the current weather at this moment 
-- Support dark theme and light theme
-- Suppprt arabic and english language
-- Save any location you want via wishlist screen
+- Forecast for next 5 days every 3 hours.
+- Search any location you want by city name or state code.
+- Sugessted cities to know the current weather at this moment.
+- More details for current air quality and other pollutants.
+- Support dark theme and light theme.
+- Suppprt arabic and english language.
+
 
 ## Technologies
 
@@ -56,6 +58,7 @@ Jetpack Compose [The modern ui toolkit for building native ui on android].
 - Hilt                2.42 (https://developer.android.com/training/dependency-injection/hilt-android)
 - Navigation          2.5.2 (https://developer.android.com/jetpack/compose/navigation)
 - ConstraintLayout    1.0.1 (https://developer.android.com/jetpack/androidx/releases/constraintlayout)
+- SplashScreen        1.0.0 (https://developer.android.com/develop/ui/views/launch/splash-screen/migrate)  
 
 ## Setup
 
