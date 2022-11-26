@@ -127,7 +127,12 @@ fun Header(
             Button(modifier = Modifier.padding(start = MEDIUM_MARGIN),
                 colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.secondary),
                 onClick = {
-                    viewModel.saveCityName(textFieldState)
+                    viewModel.apply {
+                        saveCityName(textFieldState)
+                        // 13 index means the city has been added outside the suggested cities list,
+                        // means user preference too.
+                        saveCityIndex(13)
+                    }
                     context.toast("$textFieldState ${context.resources.getString(R.string.city_saved)}")
                     navController.navigateUp()
                 }) {

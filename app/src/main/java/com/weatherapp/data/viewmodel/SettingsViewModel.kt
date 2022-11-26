@@ -54,7 +54,8 @@ class SettingsViewModel @Inject constructor(
             9 -> context.getString(R.string.saint_petersburg)
             10 -> context.getString(R.string.rome)
             11 -> context.getString(R.string.kuwait)
-            else -> context.getString(R.string.bilbeis)
+            12 -> context.getString(R.string.pakistan)
+            else -> context.getString(R.string.user_preference)
         }
     }
 }

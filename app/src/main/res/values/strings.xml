@@ -56,7 +56,6 @@
     <string name="saint_petersburg">Saint Petersburg</string>
     <string name="rome">Rome</string>
     <string name="kuwait">Kuwait</string>
-    <string name="bilbeis">Bilbeis</string>
     <string name="pakistan">Pakistan</string>
     <string name="dark_theme">Enable dark theme</string>
 
@@ -80,6 +79,7 @@
     <string name="particulates_matter10">So called fine particulate matter (PM2.5), tends to penetrate into the gas exchange regions of the lung.</string>
     <string name="nitrogen_dioxide">Nitrogen dioxide is a chemical compound with the formula NO2. It is one of several nitrogen oxides.</string>
     <string name="title_five_days">5 days forecast</string>
+    <string name="user_preference">user preference</string>
 
 
 </resources>

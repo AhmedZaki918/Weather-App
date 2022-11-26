@@ -43,7 +43,6 @@
     <string name="saint_petersburg">سانت بطرسبرغ</string>
     <string name="rome">روما</string>
     <string name="kuwait">الكويت</string>
-    <string name="bilbeis">بلبيس</string>
     <string name="dark_theme">تفعيل الوضع الليلى</string>
     <string name="home">الرئيسية</string>
     <string name="wishlist">المفضلة</string>
@@ -64,4 +63,5 @@
     <string name="particulates_matter2.5">الجسيمات المعروفة أيضًا باسم الجسيمات (PM) هي جسيمات مجهرية من مادة صلبة أو سائلة معلقة في الهواء.</string>
     <string name="particulates_matter10">يميل ما يسمى بالجسيمات الدقيقة (PM2.5) إلى اختراق مناطق تبادل الغازات في الرئة.</string>
     <string name="nitrogen_dioxide">ثاني أكسيد النيتروجين مركب كيميائي له الصيغة NO2. إنه أحد أكاسيد النيتروجين المتعددة.</string>
+    <string name="user_preference">تفضيل المستخدم</string>
 </resources>
