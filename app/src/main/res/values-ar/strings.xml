@@ -59,7 +59,7 @@
     <string name="pakistan">باكستان</string>
     <string name="current_cloudiness">الغيوم الحالية</string>
     <string name="aqi">AQI</string>
-    <string name="title_five_days">"الطقس لمدة 4 أيام "</string>
+    <string name="title_five_days">"الطقس لمدة 5 أيام "</string>
     <string name="ozone">الأوزون ، أو ثلاثي الأكسجين ، هو جزيء غير عضوي له الصيغة الكيميائية O3. إنه غاز أزرق شاحب ذو رائحة نفاذة مميزة.</string>
     <string name="particulates_matter2.5">الجسيمات المعروفة أيضًا باسم الجسيمات (PM) هي جسيمات مجهرية من مادة صلبة أو سائلة معلقة في الهواء.</string>
     <string name="particulates_matter10">يميل ما يسمى بالجسيمات الدقيقة (PM2.5) إلى اختراق مناطق تبادل الغازات في الرئة.</string>
