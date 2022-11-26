@@ -32,10 +32,10 @@ Jetpack Compose [The modern ui toolkit for building native ui on android].
 ## Functionality
 - Forecast for next 5 days every 3 hours.
 - Search any location you want by city name or state code.
-- Sugessted cities to know the current weather at this moment.
+- Suggested cities to know the current weather at this moment.
 - More details for current air quality and other pollutants.
 - Support dark theme and light theme.
-- Suppprt arabic and english language.
+- Support arabic and english language.
 
 
 ## Technologies
