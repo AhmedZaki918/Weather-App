@@ -40,7 +40,7 @@ fun ListWeatherForecast(
 
         // Time & Date
         if (timeVisibility) {
-            // Display date only
+            // Display date only in home screen
             Text(
                 buildAnnotatedString {
                     withStyle(
@@ -68,7 +68,7 @@ fun ListWeatherForecast(
             )
 
         } else {
-            // Display time and date
+            // Display time and date in details screen
             Text(
                 buildAnnotatedString {
                     withStyle(

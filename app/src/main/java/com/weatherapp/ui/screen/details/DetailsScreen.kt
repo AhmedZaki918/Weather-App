@@ -6,17 +6,21 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
@@ -65,7 +69,7 @@ fun DetailsScreen(
             RequestState.IDLE -> {
                 LoadingScreen()
             }
-            RequestState.COMPLETE -> {
+            RequestState.SUCCESS -> {
                 UpdateUi(viewModel, apiError, cloudiness)
             }
             RequestState.ERROR -> {
@@ -99,13 +103,33 @@ fun DetailsScreen(
 
 @Composable
 fun LoadingScreen() {
-    Box(
+    Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colors.background),
-        contentAlignment = Alignment.Center
+            .background(MaterialTheme.colors.background)
+            .padding(start = SMALL_MARGIN, end = SMALL_MARGIN, top = BIG_MARGIN)
     ) {
-        CircularProgressIndicator()
+
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(150.dp)
+                .padding(start = SMALL_MARGIN, end = SMALL_MARGIN, bottom = SMALL_MARGIN)
+                .clip(shape = RoundedCornerShape(10.dp))
+                .shimmerEffect()
+        )
+
+        for (x in 1..3){
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(100.dp)
+                    .padding(start = SMALL_MARGIN, end = SMALL_MARGIN, bottom = SMALL_MARGIN)
+                    .clip(shape = RoundedCornerShape(10.dp))
+                    .shimmerEffect()
+            )
+
+        }
     }
 }
 
@@ -324,7 +348,7 @@ fun Header(
         )
 
 
-        // Current 3 days forecast
+        // Current 5 days forecast
         Text(
             modifier = Modifier.constrainAs(txtTitleFiveDays) {
                 top.linkTo(circleCloudiness.bottom, BIG_MARGIN)

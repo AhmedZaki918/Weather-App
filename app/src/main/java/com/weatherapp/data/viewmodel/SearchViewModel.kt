@@ -59,7 +59,7 @@ class SearchViewModel @Inject constructor(
     fun initGeocoding(city: String) {
         viewModelScope.launch {
             _geocoding.value = repo.getGeocoding(city)
-            requestState.value = RequestState.COMPLETE
+            requestState.value = RequestState.SUCCESS
         }
     }
 

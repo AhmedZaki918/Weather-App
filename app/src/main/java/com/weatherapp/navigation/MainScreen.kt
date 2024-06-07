@@ -1,12 +1,22 @@
 package com.weatherapp.navigation
 
+import android.annotation.SuppressLint
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.RowScope
-import androidx.compose.material.*
-import androidx.compose.runtime.*
+import androidx.compose.material.BottomNavigation
+import androidx.compose.material.BottomNavigationItem
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.Icon
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Scaffold
+import androidx.compose.material.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -14,18 +24,17 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.weatherapp.R
-import com.weatherapp.data.local.Constants
-import com.weatherapp.data.local.Constants.CITY_SCREEN
-import com.weatherapp.data.local.Constants.DETAILS_SCREEN
-import com.weatherapp.data.local.Constants.ERROR_SCREEN
 import com.weatherapp.data.local.Constants.HOME
-import com.weatherapp.data.local.Constants.LATITUDE
-import com.weatherapp.data.local.Constants.LONGITUDE
 import com.weatherapp.data.local.Constants.SEARCH
 import com.weatherapp.data.local.Constants.WISHLIST
-import com.weatherapp.data.viewmodel.*
+import com.weatherapp.data.viewmodel.CityViewModel
+import com.weatherapp.data.viewmodel.DetailsViewModel
+import com.weatherapp.data.viewmodel.HomeViewModel
+import com.weatherapp.data.viewmodel.SearchViewModel
+import com.weatherapp.data.viewmodel.SettingsViewModel
 
 
+@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @ExperimentalMaterialApi
 @Composable
 fun MainScreen(
@@ -65,22 +74,18 @@ fun BottomBar(navController: NavHostController) {
     val currentDestination = navBackStackEntry?.destination
     var bottomBarState by rememberSaveable { (mutableStateOf(true)) }
 
-    when (currentDestination?.route) {
-        BottomBarScreen.Home.route -> bottomBarState = true
-        BottomBarScreen.Search.route -> bottomBarState = true
-        BottomBarScreen.Settings.route -> bottomBarState = true
-        "$ERROR_SCREEN/{${Constants.TITLE}}/{${Constants.TEXT}}/{${Constants.CONFIRM}}" -> {
-            bottomBarState = false
-        }
-        CITY_SCREEN -> bottomBarState = false
-        "$DETAILS_SCREEN/{$LONGITUDE}/{$LATITUDE}/{${Constants.CLOUDINESS}}" -> bottomBarState = false
+    bottomBarState = when (currentDestination?.route) {
+        BottomBarScreen.Home.route -> true
+        BottomBarScreen.Search.route -> true
+        BottomBarScreen.Settings.route -> true
+        else -> false
     }
 
 
     AnimatedVisibility(visible = bottomBarState,
         content = {
             BottomNavigation(
-                backgroundColor = MaterialTheme.colors.surface,
+                backgroundColor = MaterialTheme.colors.onPrimary,
                 contentColor = MaterialTheme.colors.primary
             ) {
                 screens.forEach { screen ->
@@ -129,10 +134,4 @@ fun RowScope.AddItem(
             }
         }
     )
-}
-
-
-@Preview(showSystemUi = true)
-@Composable
-fun MainScreenPreview() {
 }

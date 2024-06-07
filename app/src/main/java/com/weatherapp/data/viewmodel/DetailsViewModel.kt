@@ -75,7 +75,7 @@ class DetailsViewModel @Inject constructor(
     ) {
         _currentPollution.value = airPollutionResponse
         _weatherForecast.value = forecastResponse
-        requestState.value = RequestState.COMPLETE
+        requestState.value = RequestState.SUCCESS
     }
 
     fun getAirQuality(value: Int) = repo.airQualityStatus(value)

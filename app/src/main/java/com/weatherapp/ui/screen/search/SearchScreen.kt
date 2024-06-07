@@ -61,7 +61,7 @@ fun SearchScreen(
     val context = LocalContext.current
 
 
-    if (viewModel.requestState.value == RequestState.COMPLETE) {
+    if (viewModel.requestState.value == RequestState.SUCCESS) {
         val geocodingResponse by viewModel.geocoding.collectAsState()
         val weatherResponse by viewModel.currentWeather.collectAsState()
         val forecastResponse by viewModel.weatherForecast.collectAsState()

@@ -347,7 +347,7 @@ fun CustomButton(
                 withStyle(style = ParagraphStyle(lineHeight = 18.sp)) {
                     withStyle(
                         style = SpanStyle(
-                            color = MaterialTheme.colors.primaryVariant,
+                            color = LightGray,
                             fontSize = 17.sp
                         )
                     ) {
@@ -355,7 +355,7 @@ fun CustomButton(
                     }
                     withStyle(
                         style = SpanStyle(
-                            color = MaterialTheme.colors.secondary,
+                            color = Yellow,
                             fontSize = 12.sp
                         )
                     ) {
