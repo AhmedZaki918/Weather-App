@@ -7,7 +7,7 @@ import com.weatherapp.data.model.AirQuality
 import com.weatherapp.data.model.status.PollutionStatus
 import com.weatherapp.data.network.APIService
 import com.weatherapp.data.network.SafeApiCall
-import com.weatherapp.ui.theme.*
+import com.weatherapp.presentation.theme.*
 import com.weatherapp.util.getLocal
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
